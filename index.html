@@ -168,13 +168,14 @@ const STEPS=[
 {k:'plan',t:'대책',q:'그래서 내가 해볼 수 있는 가장 작은 대책은 무엇인가요?',ex:'내일 아침부터 좋은 아빠가 되는 법 검색하기',
  cues:['사실과 내 해석을 나눠서 적어 보기','믿을 만한 사람에게 이야기하기','오늘은 결정을 미루고 쉬기','내일 아침 10분만 알아보기','상담 시간에 이 기록 가져가기']}
 ];
-const PERSONA=`너는 인지행동치료(CBT)와 상처 회복을 30년 넘게 다뤄 온 임상심리 전문가이자 정신건강의학과 전문의처럼 생각하고 말하는 도우미다. 사용자는 상처에서 회복하는 중인 성인이다.
+const PERSONA=`너는 30년 넘게 임상에서 일해 온 심리상담 전문가이자 정신건강의학과 전문의처럼 생각하고 말하는 도우미다. 특히 트라우마와 오래된 상처 때문에 스스로 극복하기 어려워하는 사람을 돕는 데 능숙하고, 인지행동치료(CBT)에 밝다. 사용자는 상처에서 회복하는 중인 성인이다.
 원칙:
 1) 교과서 같은 원론적 조언("충분히 쉬세요", "긍정적으로 생각하세요" 등)은 금지. 반드시 사용자가 직접 쓴 표현과 상황을 짚어서 이 사람에게만 맞는 구체적인 말을 한다.
-2) 진단하지 않는다. 숨은 원인을 단정하지 않는다. "~일 수도 있어요", "~인 것 같아요"처럼 사용자가 고칠 수 있는 임시 표현만 쓴다.
-3) 답을 대신 정해 주지 않는다. 사용자가 스스로 떠올리도록 작은 단서를 준다.
-4) 따뜻하고 짧은 해요체. 훈계, 과장된 위로, 이모지 금지.
-5) 자해나 자살을 떠올리는 내용이 보이면 단서 대신, 지금 혼자 있지 말고 자살예방상담전화 109나 믿을 만한 사람에게 바로 연락하도록 부드럽게 권한다.
+2) 아래에 [메모]와 [최근 기록]이 있으면 꼭 활용한다. 이 사람에게 반복되는 상황, 자주 드는 생각, 전에 도움이 됐던 행동을 반영해서, 시간이 지날수록 더 잘 맞는 제안을 한다. 반복되는 모습은 "~하는 편인 것 같아요"처럼 말한다.
+3) 진단명이나 성격 유형을 붙이지 않는다. 숨은 원인을 단정하지 않는다. "~일 수도 있어요", "~인 것 같아요"처럼 사용자가 고칠 수 있는 임시 표현만 쓴다.
+4) 답을 대신 정해 주지 않는다. 사용자가 스스로 떠올리도록 작은 단서를 준다. 상처가 깊은 사람은 자책으로 빠지기 쉬우니, 책임을 묻는 표현 대신 그때 그럴 수밖에 없었던 이유를 함께 본다.
+5) 따뜻하고 짧은 해요체. 훈계, 과장된 위로, 이모지 금지.
+6) 자해나 자살을 떠올리는 내용이 보이면 단서 대신, 지금 혼자 있지 말고 자살예방상담전화 109나 믿을 만한 사람에게 바로 연락하도록 부드럽게 권한다.
 출력은 설명 없이 JSON 하나만.`;
 
 /* ---------- illustrations (original drawings) ---------- */
@@ -222,14 +223,38 @@ async function boot(){
 }
 
 /* ---------- AI ---------- */
-async function askAI(task){
+async function gem(prompt){
   const st=settings();if(!st.key){AIERR='nokey';return null}
   try{
-    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(st.model||'gemini-2.5-flash')+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':st.key},body:JSON.stringify({contents:[{parts:[{text:PERSONA+'\n\n'+task}]}],generationConfig:{responseMimeType:'application/json',temperature:0.7}})});
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(st.model||'gemini-2.5-flash')+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':st.key},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json',temperature:0.7}})});
     if(!r.ok){AIERR=r.status;return null}
     const j=await r.json(),t=j.candidates[0].content.parts.map(p=>p.text||'').join('').replace(/^```(json)?\s*|```\s*$/g,'').trim();
     const v=JSON.parse(t);AIERR=0;return v&&typeof v==='object'?v:null;
   }catch(e){AIERR='net';return null}
+}
+const cut=(s,n)=>String(s||'').replace(/\s+/g,' ').slice(0,n);
+function historyText(){
+  const ds=Object.keys(S.docs).filter(k=>k.startsWith('day_')).sort().slice(-14).map(k=>S.docs[k]);
+  const L=ds.map(d=>`${d.date} 우울 ${d.dep==null?'-':d.dep} 불안 ${d.anx==null?'-':d.anx}`+(d.q1?` | 상황: ${cut(d.q1,140)}`:'')+(d.q2?` | 반응: ${cut(d.q2,110)}`:'')+((d.q3||[]).length||d.q3etc?` | 필요했던 것: ${(d.q3||[]).concat(d.q3etc?[d.q3etc]:[]).join(', ')}`:'')+(d.q4?` | 작은 행동: ${cut(d.q4,90)}`:'')+((d.emotions||[]).length?` | 감정 이름표: ${d.emotions.join(', ')}`:'')+(d.h1?` | 행복했던 순간: ${cut(d.h1,90)}`:''));
+  const cb=cbtList().filter(r=>r.done&&r.summary).slice(0,5).map(r=>`${r.date} ${cut(r.summary,220)}`);
+  const pf=(S.docs.aiprofile||{}).text||'';
+  return (pf?`[메모: 이 사용자에 대해 지금까지 정리된 내용. 사용자가 직접 보고 고칠 수 있음]\n${pf}\n\n`:'')+(L.length?`[최근 기록]\n${L.join('\n')}\n\n`:'')+(cb.length?`[최근 생각 따라가기 정리]\n${cb.join('\n')}\n\n`:'');
+}
+async function askAI(task){const v=await gem(PERSONA+'\n\n'+historyText()+task);if(v)logAI(task,v);return v}
+function logAI(task,v){
+  const lg=clone(S.docs.ailog||{kind:'ailog',items:[],since:0});
+  lg.items.push({t:Date.now(),ctx:cut(task,700),reply:cut(JSON.stringify(v),700),picked:[]});lg.items=lg.items.slice(-60);lg.since=(lg.since||0)+1;
+  S.docs.ailog=lg;persist('ailog');if(lg.since>=3)updateProfile();
+}
+function logPick(t){const lg=S.docs.ailog;if(!lg||!lg.items.length)return;lg.items[lg.items.length-1].picked.push(cut(t,120));persist('ailog')}
+let pfBusy=false;
+async function updateProfile(){
+  if(pfBusy)return false;pfBusy=true;
+  const lg=S.docs.ailog||{items:[]};
+  const v=await gem(PERSONA+'\n\n'+historyText()+`[최근 도움 대화]\n${lg.items.slice(-12).map(i=>`- 상황: ${cut(i.ctx,320)}\n  도우미 답: ${cut(i.reply,280)}\n  사용자가 고른 것: ${i.picked.join(', ')||'(고르지 않음)'}`).join('\n')||'(없음)'}\n\n[할 일] 위 기록과 대화만을 근거로 [메모]를 새로 고쳐 쓴다. 기존 메모에서 여전히 맞는 내용은 남기고, 새로 드러난 것을 더하고, 틀린 것으로 보이는 것은 지운다. 아래 항목마다 한두 줄씩, 사용자가 실제로 쓴 표현을 살려서 쓴다. 근거가 부족한 항목은 "아직 잘 모름"이라고 쓴다. 진단명, 성격 유형, 추측한 과거사는 쓰지 않는다.\n항목: 1) 마음이 자주 힘들어지는 상황 2) 그때 자주 드는 생각 3) 몸과 행동의 반응 4) 그럴 때 자주 필요로 하는 것 5) 실제로 도움이 됐거나 스스로 고른 작은 행동 6) 행복을 느끼는 순간 7) 도와줄 때 잘 맞는 말투와 피해야 할 것(고른 단서와 고르지 않은 단서를 참고)\n형식: {"profile":"1) ...\\n2) ...\\n..."}`);
+  pfBusy=false;
+  if(v&&v.profile){S.docs.aiprofile={kind:'aiprofile',text:String(v.profile).slice(0,2500),updatedAt:Date.now()};await persist('aiprofile');if(S.docs.ailog){S.docs.ailog=Object.assign(clone(S.docs.ailog),{since:0});persist('ailog')}return true}
+  return false;
 }
 const aiWhy=()=>AIERR==='nokey'?'설정에 Gemini API 키를 넣으면 AI가 내 글을 읽고 도와줘요. 지금은 기본 단서를 보여드려요.':AIERR===429?'AI 무료 사용량을 넘었어요. 잠시 뒤 다시 눌러 주세요. 지금은 기본 단서를 보여드려요.':'AI 연결에 실패했어요 ('+AIERR+'). 설정의 API 키와 모델 이름을 확인해 주세요. 지금은 기본 단서를 보여드려요.';
 function aiBox(el,{msg,question,cues,onPick,ai}){
@@ -238,7 +263,7 @@ function aiBox(el,{msg,question,cues,onPick,ai}){
   <div class="chips">${(cues||[]).map(c=>`<button class="chip l" type="button">${esc(c)}</button>`).join('')}</div>
   <p class="sub">${ai?'AI가 제안한 임시 표현이에요. ':''}내 마음과 다르면 고르지 않아도 괜찮아요.</p>
   <div><button class="btn ghost sm" type="button" data-x>닫기</button></div>`;
-  $$('.chip',el).forEach(b=>b.onclick=()=>{onPick(b.textContent);b.classList.add('on')});
+  $$('.chip',el).forEach(b=>b.onclick=()=>{onPick(b.textContent);b.classList.add('on');if(ai)logPick(b.textContent)});
   $('[data-x]',el).onclick=()=>{el.hidden=true};
 }
 function addTo(ta,text){ta.value=ta.value.trim()?ta.value.trim()+'\n'+text:text;ta.dispatchEvent(new Event('input',{bubbles:true}));ta.focus()}
@@ -534,10 +559,15 @@ function vSettings(){
   <div class="row"><button class="btn ghost sm" id="snoti" type="button">휴대폰 알림 허용하기</button><span class="sub" id="snst">${np==='granted'?'허용됨':np==='denied'?'차단됨 (휴대폰 설정에서 풀 수 있어요)':np==='none'?'이 브라우저는 지원하지 않아요':'아직 허용 전'}</span></div>
   <p class="sub">휴대폰 알림은 앱이 켜져 있거나 최근 앱 목록에 남아 있을 때만 울려요. 앱을 완전히 닫으면 울리지 않아요.</p></section>
   <section class="card"><h3>AI 도우미 (도와줘! 버튼)</h3>
-  <label class="q" for="skey">Gemini API 키</label><input type="text" id="skey" value="${esc(st.key||'')}" placeholder="AIza..." autocomplete="off">
+  <label class="q" for="skey">Gemini API 키</label><input type="text" id="skey" value="${esc(st.key||'')}" placeholder="API 키 붙여넣기" autocomplete="off">
   <label class="q" for="smodel">모델 이름</label><input type="text" id="smodel" value="${esc(st.model||'')}" placeholder="gemini-2.5-flash">
-  <p class="sub">키는 이 휴대폰에만 저장돼요. 도와줘!를 누를 때 내가 쓴 글이 Google Gemini로 전송돼요.</p></section>
+  <p class="sub">키는 이 휴대폰에만 저장돼요. 도와줘!를 누를 때 내가 쓴 글, 최근 2주 기록, 아래 메모가 Google Gemini로 전송돼요.</p></section>
   <button class="btn" id="ssave" type="button">설정 저장하기</button>
+  <section class="card"><h3>AI가 기억하는 나</h3>
+  <p class="sub">도와줘!에서 나눈 대화 ${((S.docs.ailog||{}).items||[]).length}개가 이 휴대폰에 저장돼 있어요. 대화가 3번 쌓일 때마다 AI가 아래 메모를 새로 정리하고, 다음부터 이 메모에 맞춰 도와줘요.${(S.docs.aiprofile||{}).updatedAt?' 마지막 정리: '+fmtK(ymd(new Date(S.docs.aiprofile.updatedAt)))+'.':''}</p>
+  <textarea id="pftext" style="min-height:220px" placeholder="아직 정리된 내용이 없어요. 도와줘!를 몇 번 쓰면 여기에 채워져요." aria-label="AI가 기억하는 나">${esc((S.docs.aiprofile||{}).text||'')}</textarea>
+  <p class="sub">틀린 내용은 직접 고치거나 지울 수 있어요. AI는 고친 내용을 그대로 따라요.</p>
+  <div class="row"><button class="btn lilac sm" id="pfsave" type="button">메모 저장</button><button class="btn ghost sm" id="pfnow" type="button">지금 다시 정리하기</button><button class="btn ghost sm" id="pfdel" type="button">기억 모두 지우기</button></div></section>
   <section class="card"><h3>기록 보관과 백업</h3><p class="sub">기록과 사진은 이 휴대폰 안에만 저장돼요. 코드를 고쳐도 기록은 그대로 남지만, 크롬의 사이트 데이터를 지우거나 휴대폰을 바꾸면 사라져요. 가끔 백업 파일을 받아 두세요. 백업에는 글과 점수만 들어가고 사진·동영상은 들어가지 않아요.</p>
   <div class="row"><button class="btn ghost sm" id="bexp" type="button">백업 파일 저장</button><input type="file" id="bfile" accept="application/json,.json" hidden><button class="btn ghost sm" id="bimp" type="button">백업 파일 불러오기</button></div></section>
   `;
@@ -551,10 +581,13 @@ function bSettings(){
   $$('[data-avdel]').forEach(b=>b.onclick=async()=>{const k=b.dataset.avdel;try{await idb('media','readwrite',s=>s.delete(k))}catch(e){}delete URLS[k];S.docs.settings=Object.assign(settings(),{[k]:false});await persist('settings');render()});
   $('#ssave').onclick=async()=>{S.docs.settings={kind:'settings',name:$('#sname').value.trim(),credit:$('#scredit').value.trim(),avatar:settings().avatar,avatar2:settings().avatar2,rem:$('#srem').value||'00:00',remOff:$('#soff').checked,key:$('#skey').value.trim(),model:$('#smodel').value.trim()||'gemini-2.5-flash'};const ok=await persist('settings');if(ok)toast('설정을 저장했어요.')};
   $('#snoti').onclick=async()=>{if(!('Notification' in window)){toast('이 브라우저는 알림을 지원하지 않아요.');return}const p=await Notification.requestPermission();$('#snst').textContent=p==='granted'?'허용됨':'허용되지 않았어요'};
+  $('#pfsave').onclick=async()=>{S.docs.aiprofile={kind:'aiprofile',text:$('#pftext').value.trim(),updatedAt:Date.now()};if(await persist('aiprofile'))toast('메모를 저장했어요.')};
+  $('#pfnow').onclick=async()=>{const b=$('#pfnow');b.textContent='정리하는 중…';const ok=await updateProfile();if(S.view!=='settings')return;if(ok)render();else{b.textContent='지금 다시 정리하기';toast(AIERR==='nokey'?'먼저 API 키를 넣고 설정을 저장해 주세요.':'정리하지 못했어요 ('+AIERR+'). 키와 모델 이름을 확인해 주세요.')}};
+  $('#pfdel').onclick=async()=>{const b=$('#pfdel');if(!b.dataset.sure){b.dataset.sure=1;b.textContent='정말 지울까요? 한 번 더 누르기';return}await removeDoc('aiprofile');await removeDoc('ailog');toast('AI의 기억을 지웠어요.');render()};
   $('#bexp').onclick=()=>{const d=clone(S.docs);if(d.settings)delete d.settings.key;saveFile(new Blob([JSON.stringify(d)],{type:'application/json'}),'마음기록_백업_'+today()+'.json');toast('백업 파일을 저장했어요.')};
   $('#bimp').onclick=()=>$('#bfile').click();
   $('#bfile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
-    try{const d=JSON.parse(await f.text());let n=0;for(const k of Object.keys(d)){if(!/^(day_|cbt_|settings$)/.test(k))continue;if(k==='settings')d[k].key=settings().key;if(k.startsWith('day_'))d[k].media=(S.docs[k]&&S.docs[k].media)||[];S.docs[k]=d[k];await persist(k);n++}toast('기록 '+n+'개를 불러왔어요.')}
+    try{const d=JSON.parse(await f.text());let n=0;for(const k of Object.keys(d)){if(!/^(day_|cbt_|settings$|aiprofile$|ailog$)/.test(k))continue;if(k==='settings')d[k].key=settings().key;if(k.startsWith('day_'))d[k].media=(S.docs[k]&&S.docs[k].media)||[];S.docs[k]=d[k];await persist(k);n++}toast('기록 '+n+'개를 불러왔어요.')}
     catch(err){toast('백업 파일을 읽지 못했어요. 이 앱에서 저장한 파일인지 확인해 주세요.')}};
 }
 const VIEWS={home:vHome,record:vRecord,emotions:vEmotions,cbt:vCbt,graph:vGraph,pdf:vPdf,settings:vSettings};
