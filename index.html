@@ -51,6 +51,12 @@ textarea{min-height:84px;resize:vertical}
 .av.l3{border-color:#CFCAF5}
 .av.l4{filter:grayscale(.35) brightness(.98);border-color:#CFC8D8}
 .av.l5{filter:grayscale(.65) brightness(.95);border-color:#BDB6C6}
+.sig{display:flex;flex-direction:column;gap:6px;background:#4A2B38;border-radius:16px;padding:8px 7px;flex:none}
+.sig i{display:block;width:17px;height:17px;border-radius:50%;background:#7A5F69}
+.sig i.on.r{background:#FF6B6B;box-shadow:0 0 0 3px rgba(255,107,107,.35)}
+.sig i.on.y{background:#FFD24D;box-shadow:0 0 0 3px rgba(255,210,77,.35)}
+.sig i.on.g{background:#4CD08A;box-shadow:0 0 0 3px rgba(76,208,138,.35)}
+.sigw{display:flex;flex-direction:column;align-items:center;gap:4px;flex:none;font-size:12px;color:var(--sub)}
 .bubble{display:flex;gap:10px;align-items:flex-end}
 .bubble .say{background:#fff;border-radius:18px 18px 18px 4px;padding:10px 14px;box-shadow:0 2px 0 var(--line);font-size:14px}
 .note{background:var(--butter);color:var(--butter-ink);border-radius:16px;padding:10px 14px;font-size:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
@@ -277,6 +283,7 @@ function addTo(ta,text){ta.value=ta.value.trim()?ta.value.trim()+'\n'+text:text;
 
 /* ---------- views ---------- */
 const topBar=t=>`<div class="top"><button class="back" data-go="home" type="button">‹ 홈</button><h2>${t}</h2></div>`;
+const sigHtml=()=>{const l=level(),c=!l?'':l<=2?'g':l===3?'y':'r',t={'':'기록 전',g:'편안',y:'주의',r:'힘듦'}[c];return `<div class="sigw"><div class="sig" role="img" aria-label="감정 신호등: ${t}"><i class="r${c==='r'?' on':''}"></i><i class="y${c==='y'?' on':''}"></i><i class="g${c==='g'?' on':''}"></i></div><span>${t}</span></div>`};
 function streak(){let d=today(),n=0;if(!isDone(S.docs['day_'+d]))d=addDays(d,-1);while(isDone(S.docs['day_'+d])){n++;d=addDays(d,-1)}return n}
 function reminderTarget(){
   const st=settings();if(st.remOff||!S.loaded)return null;
@@ -295,7 +302,7 @@ function vHome(){
   const emoN=(dayDoc(t).emotions||[]).length;
   const md=mood();
   const say=!S.loaded?'기록을 불러오고 있어요. 잠시만요.':md==='low'?'오늘 많이 힘들었죠. 여기까지 적은 것만으로도 충분해요. 내가 옆에 있을게요.':md==='good'?'오늘 마음이 한결 가벼워 보여요. 이 느낌을 기억해 둬요.':hr<11?'좋은 아침이에요. 오늘 마음은 천천히 살펴봐도 돼요.':hr<18?'오늘 하루는 어떻게 흘러가고 있나요?':'오늘 하루도 애썼어요. 자기 전에 마음을 한 번 적어 볼까요?';
-  return `<div class="hero"><div class="grow"><p class="sub">${fmtK(t)}</p><h1>${st.name?esc(st.name)+'야,<br>':''}오늘 마음은 어때?</h1></div>${avKey()?`<div class="avw"><img class="av l${level()}" data-mid="${avKey()}" alt="내 사진">${level()?`<span class="pill">오늘 평균 ${avgToday()}점</span>`:''}</div>`:''}</div>
+  return `<div class="hero"><div class="grow"><p class="sub">${fmtK(t)}</p><h1>${st.name?esc(st.name)+'야,<br>':''}오늘 마음은 어때?</h1></div>${sigHtml()}${avKey()?`<div class="avw"><img class="av l${level()}" data-mid="${avKey()}" alt="내 사진">${level()?`<span class="pill">오늘 평균 ${avgToday()}점</span>`:''}</div>`:''}</div>
   <div class="bubble">${MONG(60,md)}<div class="say">${say}</div></div>
   ${rt?`<div class="note"><span>${rt===t?'오늘':'어제'} 마음 기록이 아직 없어요.</span><button class="btn sm" id="remgo" type="button">지금 쓰기</button></div>`:''}
   <button class="bn r" data-open="record" type="button"><span class="ic">${ico('heart','#D9557F')}</span><span class="grow"><b>오늘의 마음 기록</b><span>${n?`연속 ${n}일째 · `:''}매일 작성</span></span><span class="pill ${done?'ok':''}">${done?'작성 완료':'미작성'}</span></button>
