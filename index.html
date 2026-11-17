@@ -241,7 +241,7 @@ function aiBox(el,{msg,question,cues,onPick,ai}){
 function addTo(ta,text){ta.value=ta.value.trim()?ta.value.trim()+'\n'+text:text;ta.dispatchEvent(new Event('input',{bubbles:true}));ta.focus()}
 
 /* ---------- views ---------- */
-const top=t=>`<div class="top"><button class="back" data-go="home" type="button">‹ 홈</button><h2>${t}</h2></div>`;
+const topBar=t=>`<div class="top"><button class="back" data-go="home" type="button">‹ 홈</button><h2>${t}</h2></div>`;
 function streak(){let d=today(),n=0;if(!isDone(S.docs['day_'+d]))d=addDays(d,-1);while(isDone(S.docs['day_'+d])){n++;d=addDays(d,-1)}return n}
 function reminderTarget(){
   const st=settings();if(st.remOff||!S.loaded)return null;
@@ -269,7 +269,7 @@ function scaleHtml(k,label,lo,hi){
 }
 function vRecord(){
   W=dayDoc(S.date);const isT=S.date===today();
-  return `${top('오늘의 마음 기록')}
+  return `${topBar('오늘의 마음 기록')}
   <div class="datenav"><button id="dprev" type="button" aria-label="전날">‹</button><div><h3>${fmtK(S.date)}</h3><span class="sub">${isT?'오늘':'지난 날 기록'}</span></div>${isT?'<span style="width:38px"></span>':'<button id="dnext" type="button" aria-label="다음 날">›</button>'}</div>
   <section class="card"><h3>오늘 하루, 나의 마음은 얼마나 힘들었나요?</h3>
   ${scaleHtml('dep','주관적 우울감','전혀 우울하지 않음','감당하기 어려울 정도로 우울함')}
@@ -342,7 +342,7 @@ Q4 지금까지 쓴 답: ${W.q4||'(비어 있음)'}
 }
 function vEmotions(){
   W=dayDoc(S.date);
-  return `${top('감정에 이름표 붙이기')}
+  return `${topBar('감정에 이름표 붙이기')}
   <div class="bubble">${MONG(52)}<div class="say">지금 나는 어떤 감정인가요? 여러 개를 골라도 돼요.</div></div>
   <section class="card"><p class="sub">${fmtK(S.date)}에 붙인 이름표</p><div class="chips" id="sel"></div>
   <input type="text" id="enote" data-f="emoNote" placeholder="이 감정에 대해 한 줄 남기기 (선택)" value="${esc(W.emoNote)}" aria-label="감정 메모"></section>
@@ -373,12 +373,12 @@ function vCbt(){
   const c=S.cbt;
   if(!c){
     const list=cbtList();
-    return `${top('생각 따라가기')}
+    return `${topBar('생각 따라가기')}
     <div class="bubble">${MONG(52)}<div class="say">행동에서 시작해서 한 단계씩 거슬러 올라가 볼게요. 막히면 도와줘! 버튼을 눌러요.</div></div>
     <section class="card"><div class="steps">${STEPS.map((s,i)=>`<span>${i+1} ${s.t}</span>`).join('')}</div><p class="sub">행동 → 신체 반응 → 감정 → 생각 → 사건 → 대책 순서로, 앞 단계를 채워야 다음 단계가 열려요.</p><button class="btn mint" id="cnew" type="button">새로 시작하기</button></section>
     ${list.length?`<h3>지난 기록</h3>${list.map(r=>`<div class="rec"><div class="row"><b class="d grow" style="font-weight:400">${fmtK(r.date)}</b><span class="pill" style="background:${r.done?'var(--mint-soft)':'var(--butter)'}">${r.done?'완료':'작성 중'}</span></div><p>${esc(r.summary||STEPS.map(s=>r.steps[s.k]).filter(Boolean)[0]||'')}</p><div class="row"><button class="btn ghost sm" data-copen="${r.id}" type="button">${r.done?'다시 보기':'이어서 쓰기'}</button><button class="btn ghost sm" data-cdel="${r.id}" type="button">지우기</button></div></div>`).join('')}`:''}`;
   }
-  if(c.phase==='summary')return `${top('생각 따라가기')}
+  if(c.phase==='summary')return `${topBar('생각 따라가기')}
     <section class="card"><h3>내가 적은 내용</h3>${STEPS.map(s=>`<div class="ans"><b>${s.t}</b>${esc(c.steps[s.k])}</div>`).join('')}<div><button class="btn ghost sm" id="cedit" type="button">답 고치기</button></div></section>
     <section class="card"><h3>나의 마음 정리</h3><p class="sub">임시로 정리한 문장이에요. 내 마음과 다르면 고칠 수 있어요.</p>
     <div class="ai" id="sumbox"><span class="who" id="sumwho">정리하는 중…</span><p id="sumtext">${esc(c.summary||'')}</p></div>
@@ -386,7 +386,7 @@ function vCbt(){
     <p class="q">이 문장이 내 마음과 비슷한가요?</p>
     <div class="row"><button class="btn mint" id="cyes" type="button">네, 비슷해요</button><button class="btn ghost" id="cno" type="button">조금 달라요</button></div></section>`;
   const s=STEPS[c.i],v=c.steps[s.k]||'';
-  return `${top('생각 따라가기')}
+  return `${topBar('생각 따라가기')}
   <div class="steps">${STEPS.map((x,i)=>`<span class="${i<c.i?'done':i===c.i?'now':''}">${i<c.i?'✓':i+1} ${x.t}</span>`).join('')}</div>
   ${c.i?`<section class="card" style="gap:8px"><p class="sub">지금까지 적은 내용</p>${STEPS.slice(0,c.i).map(x=>`<div class="ans"><b>${x.t}</b>${esc(c.steps[x.k])}</div>`).join('')}</section>`:''}
   <section class="card"><p class="sub">${c.i+1}단계 · ${s.t}</p><label class="q" for="cans">${s.q}</label>
@@ -398,7 +398,7 @@ function vCbt(){
 }
 async function saveCbt(){const c=S.cbt;S.docs['cbt_'+c.id]={kind:'cbt',id:c.id,date:c.date,createdAt:c.createdAt,steps:clone(c.steps),summary:c.summary||'',done:!!c.done};return persist('cbt_'+c.id)}
 const stepsText=(c,upto)=>STEPS.slice(0,upto).map(s=>`${s.t}: ${c.steps[s.k]||'(비어 있음)'}`).join('\n');
-function tmplSummary(c){const t=c.steps;return `"${t.event}" 일이 있은 뒤로 "${t.thought}"라는 생각을 하게 된 것 같아요. 그래서 ${t.emotion} 마음이 들고, 몸은 ${t.body} 상태이고, ${t.behavior} 것 같아요. 그래서 "${t.plan}"부터 해 보려고 해요.`}
+function tmplSummary(c){const t=c.steps;return `사건은 "${t.event}"였고, 그때 든 생각은 "${t.thought}"였어요. 감정은 "${t.emotion}", 몸의 반응은 "${t.body}", 행동은 "${t.behavior}"였어요. 먼저 "${t.plan}"부터 해 보려고 해요.`}
 function bCbt(){
   const c=S.cbt;
   if(!c){
@@ -450,7 +450,7 @@ function vGraph(){
   const ds=monthDates(S.month),docs=ds.map(d=>S.docs['day_'+d]).filter(isDone),[y,mo]=S.month.split('-').map(Number);
   const avg=k=>docs.length?(docs.reduce((a,d)=>a+d[k],0)/docs.length).toFixed(1):'–';
   const first=new Date(y,mo-1,1).getDay();
-  return `${top('월별 그래프')}
+  return `${topBar('월별 그래프')}
   <div class="datenav"><button id="mprev" type="button" aria-label="이전 달">‹</button><div><h3>${y}년 ${mo}월</h3><span class="sub">기록한 날 ${docs.length}일</span></div>${S.month>=today().slice(0,7)?'<span style="width:38px"></span>':'<button id="mnext" type="button" aria-label="다음 달">›</button>'}</div>
   <section class="card"><div class="legend"><span><i></i>우울감 (평균 ${avg('dep')})</span><span><i class="a"></i>불안감 (평균 ${avg('anx')})</span><span>점선은 6점</span></div><div id="cvw"><canvas id="cv" role="img" aria-label="${mo}월 우울감과 불안감 점수 그래프"></canvas></div>${docs.length?'':'<p class="sub">이 달에는 아직 기록이 없어요.</p>'}</section>
   <section class="card"><h3>작성한 날</h3><div class="cal">${WD.map(w=>`<span>${w}</span>`).join('')}${'<span></span>'.repeat(first)}${ds.map(d=>{const x=S.docs['day_'+d],dn=isDone(x),hi=dn&&Math.max(x.dep,x.anx)>=6;return `<span class="${hi?'hi':dn?'w':''}">${+d.slice(8)}</span>`}).join('')}</div><p class="sub">연한 분홍은 기록한 날, 진한 분홍은 6점 이상이었던 날이에요.</p></section>`;
@@ -463,7 +463,7 @@ function bGraph(){
 /* pdf */
 function vPdf(){
   const t=today();
-  return `${top('PDF 만들기')}
+  return `${topBar('PDF 만들기')}
   <section class="card"><p>기간을 고르면 점수 그래프, 날짜별 기록, 감정 이름표, 생각 따라가기 기록이 한 파일로 정리돼요. 상담에 가져가기 좋아요.</p>
   <label for="pf">시작일</label><input type="date" id="pf" value="${addDays(t,-29)}" max="${t}">
   <label for="pt">종료일</label><input type="date" id="pt" value="${t}" max="${t}">
@@ -517,7 +517,7 @@ async function buildPdf(f,t,photos,st){
 /* settings */
 function vSettings(){
   const st=settings(),np=('Notification' in window)?Notification.permission:'none';
-  return `${top('설정')}
+  return `${topBar('설정')}
   <section class="card"><label class="q" for="sname">홈 화면에서 부를 이름</label><input type="text" id="sname" value="${esc(st.name||'')}" placeholder="이름">
   <p class="q">홈 화면에 넣을 내 사진</p><div class="row"><input type="file" id="avfile" accept="image/*" hidden><button class="btn ghost sm" id="avpick" type="button">사진 고르기</button>${st.avatar?'<button class="btn ghost sm" id="avdel" type="button">사진 빼기</button>':''}<span class="sub" id="avst">${st.avatar?'사진이 들어가 있어요':'아직 없어요'}</span></div>
   <label class="q" for="scredit">홈 화면 아래 문구</label><input type="text" id="scredit" value="${esc(st.credit||'')}" placeholder="Crafted by. ...">
