@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>마음 기록</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FFF5F7">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* layout: one phone-width column of soft rounded cards on a blush page; single light theme by choice */
+  --bg:#FFF5F7; --card:#FFFFFF; --ink:#4A2B38; --sub:#946577; --line:#F7D3DF;
+  --rose:#D9557F; --rose-soft:#FCE4EC; --lilac:#7468D6; --lilac-soft:#ECEAFD;
+  --mint:#1F8F6C; --mint-soft:#DDF4EC; --butter:#FFF0CC; --butter-ink:#7D5310;
+  --display:'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --body:'Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.65;-webkit-text-size-adjust:100%}
+#app{max-width:480px;margin:0 auto;padding:18px 16px 40px;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3,.d{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance}
+h1{font-size:24px;line-height:1.3} h2{font-size:19px} h3{font-size:16px}
+p{margin:0}
+.sub{color:var(--sub);font-size:13px}
+button{font-family:var(--body);font-size:15px;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--lilac);outline-offset:2px}
+textarea,input[type=text],input[type=date],input[type=time],input[type=search]{width:100%;font-family:var(--body);font-size:15px;color:var(--ink);background:#FFFBFC;border:1.5px dashed #EFA9C0;border-radius:14px;padding:10px 12px;line-height:1.6}
+textarea{min-height:84px;resize:vertical}
+.card{background:var(--card);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 0 var(--line)}
+.btn{font-family:var(--display);font-size:16px;background:var(--rose);color:#fff;border-radius:999px;padding:11px 20px;text-align:center}
+.btn.mint{background:var(--mint)} .btn.lilac{background:var(--lilac)}
+.btn.ghost{background:#fff;color:var(--rose);border:1.5px solid var(--line)}
+.btn.sm{font-size:14px;padding:7px 14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.top{display:flex;align-items:center;gap:10px}
+.back{font-family:var(--display);background:#fff;border-radius:999px;padding:6px 14px;color:var(--rose);box-shadow:0 2px 0 var(--line)}
+.hero{display:flex;gap:12px;align-items:center}
+.hero svg{flex:none}
+.av{width:88px;height:88px;border-radius:50%;object-fit:cover;flex:none;border:3px solid #F9C9D6;background:#FDE9E6}
+.bubble{display:flex;gap:10px;align-items:flex-end}
+.bubble .say{background:#fff;border-radius:18px 18px 18px 4px;padding:10px 14px;box-shadow:0 2px 0 var(--line);font-size:14px}
+.note{background:var(--butter);color:var(--butter-ink);border-radius:16px;padding:10px 14px;font-size:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bn{display:flex;gap:12px;align-items:center;border-radius:22px;padding:14px;text-align:left;width:100%}
+.bn .ic{width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.bn b{font-family:var(--display);font-weight:400;font-size:17px;display:block}
+.bn span{font-size:13px}
+.bn.r{background:var(--rose-soft)} .bn.r span{color:#A63E63}
+.bn.l{background:var(--lilac-soft);color:#3A3190} .bn.l span{color:#5348B5}
+.bn.m{background:var(--mint-soft);color:#0B5A43} .bn.m span{color:#17775A}
+.bn.z{background:#F3EEF0;color:#8B7780}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;background:#fff}
+.pill.ok{background:var(--mint);color:#fff}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{background:#fff;border-radius:18px;padding:12px 6px;text-align:center;font-family:var(--display);font-size:14px;box-shadow:0 2px 0 var(--line)}
+.foot{text-align:center;color:var(--sub);font-size:13px;font-family:var(--display);letter-spacing:.3px;padding-top:6px}
+.datenav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.datenav button{width:38px;height:38px;border-radius:50%;background:#fff;font-size:20px;color:var(--rose);box-shadow:0 2px 0 var(--line)}
+.datenav div{text-align:center}
+.scale{display:grid;grid-template-columns:repeat(11,1fr);gap:3px}
+.scale button{aspect-ratio:1;border-radius:50%;background:#fff;border:1.5px solid var(--line);font-size:13px;color:#A63E63;font-variant-numeric:tabular-nums}
+.scale button.on{background:var(--rose);border-color:var(--rose);color:#fff;font-family:var(--display)}
+.ends{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);gap:10px}
+.ends span:last-child{text-align:right}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;color:#8A3E5B}
+.chip.on{background:var(--rose);border-color:var(--rose);color:#fff}
+.chip.l{border-color:#CFCAF5;color:#4338A8} .chip.l.on{background:var(--lilac);border-color:var(--lilac);color:#fff}
+.chip.m{border-color:#A9E2CF;color:#0B5A43}
+details{font-size:13px;color:var(--sub)}
+details summary{cursor:pointer;color:var(--rose)}
+details ul{margin:6px 0 0;padding-left:18px}
+.q{font-family:var(--display);font-size:16px}
+.ai{background:var(--lilac-soft);color:#352C86;border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;font-size:14px}
+.ai .who{font-family:var(--display);font-size:13px;color:var(--lilac)}
+.happy{background:var(--butter);color:var(--butter-ink);box-shadow:0 2px 0 #F3DDA4}
+.happy textarea,.happy input{border-color:#E6C277;background:#FFFCF2}
+.media{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.media figure{margin:0;position:relative;border-radius:14px;overflow:hidden;background:#fff;aspect-ratio:1}
+.media img,.media video{width:100%;height:100%;object-fit:cover;display:block}
+.media figure button{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;background:rgba(74,43,56,.75);color:#fff;font-size:14px}
+.savebar{position:sticky;bottom:10px;display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.94);border-radius:999px;padding:8px 8px 8px 16px;box-shadow:0 2px 0 var(--line)}
+.care{background:#fff;border:1.5px solid #EFA9C0;border-radius:18px;padding:12px 14px;font-size:14px}
+.steps{display:flex;gap:5px;flex-wrap:wrap}
+.steps span{font-size:12px;border-radius:999px;padding:3px 10px;background:#fff;color:#A9A0A4;border:1.5px solid #E9E2E5}
+.steps span.done{background:#BFEBDC;border-color:#BFEBDC;color:#0B5A43}
+.steps span.now{background:var(--mint);border-color:var(--mint);color:#fff;font-family:var(--display)}
+.ex{font-size:13px;color:#17775A;background:var(--mint-soft);border-radius:12px;padding:6px 12px}
+.err{color:#B3261E;font-size:13px}
+.ans{background:#F6FBF9;border-radius:14px;padding:8px 12px;font-size:14px}
+.ans b{font-family:var(--display);font-weight:400;color:var(--mint);margin-right:6px}
+.rec{background:#fff;border-radius:18px;padding:12px 14px;box-shadow:0 2px 0 var(--line);font-size:14px;display:flex;flex-direction:column;gap:6px}
+.legend{display:flex;gap:14px;font-size:13px;color:var(--sub);flex-wrap:wrap}
+.legend i{display:inline-block;width:18px;height:0;border-top:3px solid var(--rose);vertical-align:middle;margin-right:5px}
+.legend i.a{border-top:3px dashed var(--lilac)}
+canvas{max-width:100%;display:block}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:12px;text-align:center}
+.cal span{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--sub)}
+.cal span.w{background:var(--rose-soft);color:#A63E63}
+.cal span.hi{background:var(--rose);color:#fff}
+#toast{position:fixed;left:50%;bottom:74px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:999px;padding:9px 18px;font-size:14px;max-width:88%;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:1}
+#pdfroot{position:absolute;left:-10000px;top:0;width:760px;background:#fff;color:#33222A;font-family:var(--body);font-size:14px;line-height:1.6}
+#pdfroot .pb{padding:10px 6px;background:#fff}
+#pdfroot h1{font-size:26px} #pdfroot h2{font-size:17px;color:var(--rose)}
+#pdfroot .pd{border:1.5px solid var(--line);border-radius:14px;padding:12px 16px}
+#pdfroot .pk{color:#946577;font-size:12.5px;margin-top:6px}
+#pdfroot img{max-width:220px;max-height:220px;border-radius:10px;margin:6px 6px 0 0}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="pdfroot" aria-hidden="true"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clone=o=>JSON.parse(JSON.stringify(o));
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const today=()=>ymd(new Date());
+const toDate=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(s,n)=>{const d=toDate(s);d.setDate(d.getDate()+n);return ymd(d)};
+const WD=['일','월','화','수','목','금','토'];
+const fmtK=s=>{const d=toDate(s);return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 '+WD[d.getDay()]+'요일'};
+let toastT;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+
+/* ---------- content ---------- */
+const Q3=['누군가의 위로와 공감','안전하다는 느낌','혼자만의 시간','상대방의 사과나 설명','휴식과 수면','상황을 통제할 수 있다는 느낌'];
+const Q4EX=['따뜻한 물 마시기','10분 산책하기','믿을 만한 사람에게 연락하기','오늘은 중요한 결정을 미루기','충분히 쉬기'];
+const EMO=[
+['슬픔',['슬픈','서글픈','울적한','허전한','외로운','쓸쓸한','먹먹한','그리운','상실감이 드는','비참한']],
+['불안',['불안한','초조한','조마조마한','걱정되는','두려운','무서운','긴장되는','막막한','안절부절못하는','겁나는']],
+['분노',['화나는','짜증나는','억울한','분한','원망스러운','답답한','괘씸한','약오르는','서운한','미운']],
+['수치와 죄책감',['부끄러운','창피한','수치스러운','죄책감 드는','미안한','후회되는','자책하는','초라한','위축되는','못난 것 같은']],
+['지침과 무기력',['지친','피곤한','무기력한','공허한','멍한','귀찮은','의욕 없는','버거운','소진된','아무 느낌 없는']],
+['혼란과 놀람',['혼란스러운','당황스러운','놀란','어리둥절한','얼떨떨한','복잡한','갈팡질팡하는','믿기지 않는','충격받은','어이없는']],
+['상처와 질투',['상처받은','배신감 드는','버림받은 것 같은','무시당한 것 같은','소외된','질투나는','부러운','실망스러운','섭섭한','거절당한 것 같은']],
+['기쁨',['기쁜','행복한','즐거운','신나는','설레는','뿌듯한','자랑스러운','통쾌한','유쾌한','벅찬']],
+['평온',['편안한','평온한','차분한','안심되는','홀가분한','여유로운','느긋한','포근한','후련한','든든한']],
+['사랑과 희망',['사랑스러운','고마운','다정한','애틋한','감동적인','희망찬','기대되는','용기 나는','자신 있는','살아있는 것 같은']]
+];
+const STEPS=[
+{k:'behavior',t:'행동',q:'지금 내가 하고 있는(또는 하지 못하고 있는) 행동은 무엇인가요?',ex:'밤에 잠을 못 자고 있음',
+ cues:['잠을 못 자고 있어요','자꾸 휴대폰을 확인해요','아무것도 못 하고 누워 있어요','사람을 피하고 있어요','평소보다 많이 먹거나 거의 못 먹어요','일에 집중을 못 해요']},
+{k:'body',t:'신체 반응',q:'그때 내 몸은 어떻게 반응하고 있나요?',ex:'불면, 가슴 두근거림',
+ cues:['가슴이 두근거려요','숨이 막히는 것 같아요','소화가 안 돼요','몸에 힘이 빠져요','머리가 아파요','어깨와 턱에 힘이 들어가요','눈물이 나요']},
+{k:'emotion',t:'감정',q:'이 행동과 몸의 반응을 만든 감정은 무엇일까요?',ex:'불안함, 초조함',
+ cues:['마음이 불편해요','답답하고 숨이 막히는 것 같아요','누군가가 밉고 원망스러워요','불안하고 무서워요','슬프고 눈물이 날 것 같아요','아무 감정도 느껴지지 않아요','잘 모르겠어요']},
+{k:'thought',t:'생각',q:'내가 어떤 생각에 빠져 있길래 그 감정이 드는 걸까요?',ex:'내가 좋은 아빠가 될 수 있을까?',
+ cues:['무언가 나쁜 일이 생길 것 같아요','버림받거나 외면당할까 봐 걱정돼요','이미 일어난 일을 계속 떠올리게 돼요','내가 부족해서 그런 것 같아요','이유는 설명하기 어렵지만 마음이 불편해요']},
+{k:'event',t:'사건',q:'그 생각을 만들어낸 사건이나 상황은 무엇인가요?',ex:'아내가 임신함',
+ cues:['누군가의 말이나 행동이 있었어요','연락이 늦거나 오지 않았어요','일이나 학교에서 무슨 일이 있었어요','예전 일이 갑자기 떠올랐어요','특별한 사건은 없었어요']},
+{k:'plan',t:'대책',q:'그래서 내가 해볼 수 있는 가장 작은 대책은 무엇인가요?',ex:'내일 아침부터 좋은 아빠가 되는 법 검색하기',
+ cues:['사실과 내 해석을 나눠서 적어 보기','믿을 만한 사람에게 이야기하기','오늘은 결정을 미루고 쉬기','내일 아침 10분만 알아보기','상담 시간에 이 기록 가져가기']}
+];
+const PERSONA=`너는 인지행동치료(CBT)와 상처 회복을 30년 넘게 다뤄 온 임상심리 전문가이자 정신건강의학과 전문의처럼 생각하고 말하는 도우미다. 사용자는 상처에서 회복하는 중인 성인이다.
+원칙:
+1) 교과서 같은 원론적 조언("충분히 쉬세요", "긍정적으로 생각하세요" 등)은 금지. 반드시 사용자가 직접 쓴 표현과 상황을 짚어서 이 사람에게만 맞는 구체적인 말을 한다.
+2) 진단하지 않는다. 숨은 원인을 단정하지 않는다. "~일 수도 있어요", "~인 것 같아요"처럼 사용자가 고칠 수 있는 임시 표현만 쓴다.
+3) 답을 대신 정해 주지 않는다. 사용자가 스스로 떠올리도록 작은 단서를 준다.
+4) 따뜻하고 짧은 해요체. 훈계, 과장된 위로, 이모지 금지.
+5) 자해나 자살을 떠올리는 내용이 보이면 단서 대신, 지금 혼자 있지 말고 자살예방상담전화 109나 믿을 만한 사람에게 바로 연락하도록 부드럽게 권한다.
+출력은 설명 없이 JSON 하나만.`;
+
+/* ---------- illustrations (original drawings) ---------- */
+const MONG=(s=64)=>`<svg width="${s}" height="${s}" viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="74" rx="20" ry="3.5" fill="#F7D3DF"/><path d="M24 22c-5-9 2-17 8-10 3 3 3 8 2 12zM56 22c5-9-2-17-8-10-3 3-3 8-2 12z" fill="#fff" stroke="#F3B9CB" stroke-width="2"/><path d="M40 16c17 0 28 12 28 28S57 72 40 72 12 60 12 44s11-28 28-28z" fill="#fff" stroke="#F3B9CB" stroke-width="2"/><circle cx="30" cy="42" r="3" fill="#4A2B38"/><circle cx="50" cy="42" r="3" fill="#4A2B38"/><circle cx="31" cy="41" r="1" fill="#fff"/><circle cx="51" cy="41" r="1" fill="#fff"/><ellipse cx="23" cy="50" rx="5" ry="3.2" fill="#FBB9CC"/><ellipse cx="57" cy="50" rx="5" ry="3.2" fill="#FBB9CC"/><path d="M36 49q4 4 8 0" fill="none" stroke="#D9557F" stroke-width="2" stroke-linecap="round"/><path d="M40 12c-3-5-9-1-5 4l5 4 5-4c4-5-2-9-5-4z" fill="#D9557F"/></svg>`;
+const ICO={heart:'<path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/>',tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="8" cy="9" r="1.5"/>',stairs:'<path d="M4 20h4v-4h4v-4h4V8h4"/>',lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'};
+const ico=(n,c)=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[n]}</svg>`;
+
+/* ---------- state + storage ---------- */
+const S={view:'home',date:today(),docs:{},col:null,assets:null,downloads:null,sample:null,loaded:false,month:today().slice(0,7),cbt:null,emoQ:''};
+let W=null,saveT=null;
+let IDB=null,AIERR=0;const URLS={};
+function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open('maum',1);r.onupgradeneeded=()=>{r.result.createObjectStore('docs');r.result.createObjectStore('media')};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function idb(store,mode,fn){return new Promise((res,rej)=>{const tx=IDB.transaction(store,mode),rq=fn(tx.objectStore(store));tx.oncomplete=()=>res(rq&&rq.result);tx.onerror=tx.onabort=()=>rej(tx.error)})}
+async function persist(key){
+  if(!IDB){toast('이 브라우저에서는 저장할 수 없어요. 크롬으로 열어 주세요.');return false}
+  try{await idb('docs','readwrite',s=>s.put(clone(S.docs[key]),key));return true}
+  catch(e){toast('저장하지 못했어요. 휴대폰 저장 공간을 확인해 주세요.');return false}
+}
+async function removeDoc(key){delete S.docs[key];if(IDB){try{await idb('docs','readwrite',s=>s.delete(key))}catch(e){}}}
+async function mediaUrl(id){if(URLS[id])return URLS[id];try{const b=await idb('media','readonly',s=>s.get(id));return b?(URLS[id]=URL.createObjectURL(b)):''}catch(e){return ''}}
+async function fillMedia(root){await Promise.all($$('[data-mid]',root).map(async el=>{const u=await mediaUrl(el.dataset.mid);if(u)el.src=u;else el.remove()}))}
+const settings=()=>Object.assign({kind:'settings',name:'',credit:'',avatar:false,rem:'00:00',remOff:false,key:'',model:'gemini-2.5-flash'},S.docs.settings||{});
+const blankDay=date=>({kind:'day',date,dep:null,anx:null,q1:'',q2:'',q3:[],q3etc:'',q4:'',h1:'',h2:'',h3:'',media:[],emotions:[],emoNote:''});
+const dayDoc=date=>Object.assign(blankDay(date),S.docs['day_'+date]||{});
+const isDone=d=>!!d&&d.dep!=null&&d.anx!=null;
+function queueSave(){setSt('쓰는 중…');clearTimeout(saveT);saveT=setTimeout(commit,1300)}
+async function commit(){
+  clearTimeout(saveT);saveT=null;if(!W)return;
+  W.updatedAt=Date.now();S.docs['day_'+W.date]=clone(W);
+  const ok=await persist('day_'+W.date);setSt(ok?'저장됐어요':'저장 안 됨');
+}
+function flushSave(){if(saveT)commit()}
+function setSt(t){const e=$('#st');if(e)e.textContent=t}
+
+async function boot(){
+  render();
+  try{
+    IDB=await idbOpen();
+    await new Promise((res,rej)=>{const tx=IDB.transaction('docs'),rq=tx.objectStore('docs').openCursor();rq.onsuccess=()=>{const c=rq.result;if(c){S.docs[c.key]=c.value;c.continue()}};tx.oncomplete=res;tx.onerror=()=>rej(tx.error)});
+    if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+  }catch(e){toast('이 브라우저에서는 기록을 저장할 수 없어요. 크롬으로 열어 주세요.')}
+  S.loaded=true;render();
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+/* ---------- AI ---------- */
+async function askAI(task){
+  const st=settings();if(!st.key){AIERR='nokey';return null}
+  try{
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(st.model||'gemini-2.5-flash')+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':st.key},body:JSON.stringify({contents:[{parts:[{text:PERSONA+'\n\n'+task}]}],generationConfig:{responseMimeType:'application/json',temperature:0.7}})});
+    if(!r.ok){AIERR=r.status;return null}
+    const j=await r.json(),t=j.candidates[0].content.parts.map(p=>p.text||'').join('').replace(/^```(json)?\s*|```\s*$/g,'').trim();
+    const v=JSON.parse(t);AIERR=0;return v&&typeof v==='object'?v:null;
+  }catch(e){AIERR='net';return null}
+}
+const aiWhy=()=>AIERR==='nokey'?'설정에 Gemini API 키를 넣으면 AI가 내 글을 읽고 도와줘요. 지금은 기본 단서를 보여드려요.':AIERR===429?'AI 무료 사용량을 넘었어요. 잠시 뒤 다시 눌러 주세요. 지금은 기본 단서를 보여드려요.':'AI 연결에 실패했어요 ('+AIERR+'). 설정의 API 키와 모델 이름을 확인해 주세요. 지금은 기본 단서를 보여드려요.';
+function aiBox(el,{msg,question,cues,onPick,ai}){
+  el.hidden=false;
+  el.innerHTML=`<span class="who">${ai?'AI 도우미':'도움 단서'}</span>${msg?`<p>${esc(msg)}</p>`:''}${question?`<p><b class="d" style="font-weight:400">${esc(question)}</b></p>`:''}
+  <div class="chips">${(cues||[]).map(c=>`<button class="chip l" type="button">${esc(c)}</button>`).join('')}</div>
+  <p class="sub">${ai?'AI가 제안한 임시 표현이에요. ':''}내 마음과 다르면 고르지 않아도 괜찮아요.</p>
+  <div><button class="btn ghost sm" type="button" data-x>닫기</button></div>`;
+  $$('.chip',el).forEach(b=>b.onclick=()=>{onPick(b.textContent);b.classList.add('on')});
+  $('[data-x]',el).onclick=()=>{el.hidden=true};
+}
+function addTo(ta,text){ta.value=ta.value.trim()?ta.value.trim()+'\n'+text:text;ta.dispatchEvent(new Event('input',{bubbles:true}));ta.focus()}
+
+/* ---------- views ---------- */
+const top=t=>`<div class="top"><button class="back" data-go="home" type="button">‹ 홈</button><h2>${t}</h2></div>`;
+function streak(){let d=today(),n=0;if(!isDone(S.docs['day_'+d]))d=addDays(d,-1);while(isDone(S.docs['day_'+d])){n++;d=addDays(d,-1)}return n}
+function reminderTarget(){
+  const st=settings();if(st.remOff||!S.loaded)return null;
+  if(!Object.keys(S.docs).some(k=>k.startsWith('day_')))return null;
+  const t=st.rem||'00:00',now=new Date(),cur=pad(now.getHours())+':'+pad(now.getMinutes());
+  if(+t.slice(0,2)<12){const y=addDays(today(),-1);return cur>=t&&now.getHours()<12&&!isDone(S.docs['day_'+y])?y:null}
+  return cur>=t&&!isDone(S.docs['day_'+today()])?today():null;
+}
+function vHome(){
+  const t=today(),done=isDone(S.docs['day_'+t]),st=settings(),rt=reminderTarget(),n=streak(),hr=new Date().getHours();
+  const emoN=(dayDoc(t).emotions||[]).length;
+  const say=!S.loaded?'기록을 불러오고 있어요. 잠시만요.':done?'오늘도 마음을 들여다봤네요. 그것만으로 충분히 잘했어요.':hr<11?'좋은 아침이에요. 오늘 마음은 천천히 살펴봐도 돼요.':hr<18?'오늘 하루는 어떻게 흘러가고 있나요?':'오늘 하루도 애썼어요. 자기 전에 마음을 한 번 적어 볼까요?';
+  return `<div class="hero"><div class="grow"><p class="sub">${fmtK(t)}</p><h1>${st.name?esc(st.name)+'야,<br>':''}오늘 마음은 어때?</h1></div>${st.avatar?'<img class="av" data-mid="avatar" alt="내 사진">':''}</div>
+  <div class="bubble">${MONG(60)}<div class="say">${say}</div></div>
+  ${rt?`<div class="note"><span>${rt===t?'오늘':'어제'} 마음 기록이 아직 없어요.</span><button class="btn sm" id="remgo" type="button">지금 쓰기</button></div>`:''}
+  <button class="bn r" data-open="record" type="button"><span class="ic">${ico('heart','#D9557F')}</span><span class="grow"><b>오늘의 마음 기록</b><span>${n?`연속 ${n}일째 · `:''}매일 작성</span></span><span class="pill ${done?'ok':''}">${done?'작성 완료':'미작성'}</span></button>
+  <button class="bn l" data-open="emotions" type="button"><span class="ic">${ico('tag','#7468D6')}</span><span class="grow"><b>감정에 이름표 붙이기</b><span>감정 100가지${emoN?` · 오늘 ${emoN}개 붙였어요`:''}</span></span></button>
+  <button class="bn m" data-open="cbt" type="button"><span class="ic">${ico('stairs','#1F8F6C')}</span><span class="grow"><b>생각 따라가기</b><span>행동에서 대책까지, 한 단계씩</span></span></button>
+  <div class="bn z"><span class="ic">${ico('lock','#B5A6AC')}</span><span class="grow"><b>네 번째 배너</b><span>준비 중이에요</span></span></div>
+  <div class="tiles"><button class="tile" data-go="graph" type="button">월별 그래프</button><button class="tile" data-go="pdf" type="button">PDF 만들기</button><button class="tile" data-go="settings" type="button">설정</button></div>
+  ${st.credit?`<p class="foot">${esc(st.credit)}</p>`:''}`;
+}
+function scaleHtml(k,label,lo,hi){
+  return `<div><p class="q">${label}</p><div class="scale" role="group" aria-label="${label} 0에서 10">${Array.from({length:11},(_,i)=>`<button type="button" data-k="${k}" data-v="${i}" class="${W[k]===i?'on':''}" aria-pressed="${W[k]===i}">${i}</button>`).join('')}</div><div class="ends"><span>0 ${lo}</span><span>10 ${hi}</span></div></div>`;
+}
+function vRecord(){
+  W=dayDoc(S.date);const isT=S.date===today();
+  return `${top('오늘의 마음 기록')}
+  <div class="datenav"><button id="dprev" type="button" aria-label="전날">‹</button><div><h3>${fmtK(S.date)}</h3><span class="sub">${isT?'오늘':'지난 날 기록'}</span></div>${isT?'<span style="width:38px"></span>':'<button id="dnext" type="button" aria-label="다음 날">›</button>'}</div>
+  <section class="card"><h3>오늘 하루, 나의 마음은 얼마나 힘들었나요?</h3>
+  ${scaleHtml('dep','주관적 우울감','전혀 우울하지 않음','감당하기 어려울 정도로 우울함')}
+  ${scaleHtml('anx','주관적 불안감','전혀 불안하지 않음','감당하기 어려울 정도로 불안함')}</section>
+  <div class="care" id="care" hidden>오늘은 정말 많이 힘든 날이네요. 혼자 버티기 어렵다면 상담 선생님이나 믿을 만한 사람에게 이 기록을 보여 주세요. 지금 당장 도움이 필요하면 자살예방상담전화 <b>109</b>, 정신건강상담전화 <b>1577-0199</b>가 24시간 열려 있어요.</div>
+  <section class="card" id="deep" hidden>
+    <p class="sub">6점 이상이라 조금 더 자세히 살펴볼게요. 쓸 수 있는 만큼만 써도 돼요.</p>
+    <label class="q" for="q1">Q1. 오늘 나의 마음을 가장 힘들게 만든 상황이나 사건은 무엇이었나요?</label>
+    <details><summary>도움말 보기</summary><ul><li>어떤 일이 있었나요?</li><li>누구와 관련된 일이었나요?</li><li>실제로 일어난 일과 내가 해석한 부분을 구분해 볼까요?</li><li>특별한 사건이 없었는데도 힘들었다면 그렇게 적어도 괜찮아요.</li></ul></details>
+    <textarea id="q1" data-f="q1">${esc(W.q1)}</textarea>
+    <label class="q" for="q2">Q2. 그 상황에서 나는 어떤 반응을 보였나요?</label>
+    <details><summary>도움말 보기</summary><ul><li>행동: 울었다, 회피했다, 연락을 반복해서 확인했다, 아무것도 하지 못했다.</li><li>신체: 가슴이 두근거렸다, 숨이 막혔다, 소화가 안 됐다, 몸에 힘이 빠졌다.</li><li>생각: 같은 생각이 반복됐다, 최악의 상황을 상상했다.</li></ul></details>
+    <textarea id="q2" data-f="q2">${esc(W.q2)}</textarea>
+    <p class="q">Q3. 그 순간 나에게 가장 필요했던 것은 무엇이었나요?</p>
+    <div class="chips" id="q3">${Q3.map(x=>`<button type="button" class="chip ${W.q3.includes(x)?'on':''}" aria-pressed="${W.q3.includes(x)}">${x}</button>`).join('')}</div>
+    <input type="text" id="q3etc" data-f="q3etc" placeholder="기타: 직접 적기" value="${esc(W.q3etc)}" aria-label="Q3 기타">
+    <label class="q" for="q4">Q4. 지금 이 순간 나를 위해 해줄 수 있는 가장 작은 행동은 무엇인가요?</label>
+    <textarea id="q4" data-f="q4" placeholder="${Q4EX[0]}">${esc(W.q4)}</textarea>
+    <div class="row"><button class="btn lilac sm" id="q4help" type="button">도와줘!</button><span class="sub">모르겠거나 답이 마음에 안 들 때 눌러요</span></div>
+    <div class="ai" id="q4ai" hidden></div>
+  </section>
+  <section class="card happy"><h3>오늘 하루, 작지만 나를 행복하게 만든 순간이 있었나요?</h3>
+    <p style="font-size:13px">마음이 힘든 날에도 행복한 순간은 함께 있을 수 있어요.</p>
+    <label for="h1">어떤 일이 있었나요?</label><textarea id="h1" data-f="h1">${esc(W.h1)}</textarea>
+    <label for="h2">그 순간 나는 어떤 기분이었나요?</label><input type="text" id="h2" data-f="h2" value="${esc(W.h2)}">
+    <label for="h3">그 순간을 기억하고 싶은 이유는 무엇인가요?</label><input type="text" id="h3" data-f="h3" value="${esc(W.h3)}">
+    <div class="media" id="media"></div>
+    <div class="row" id="uprow"><input type="file" id="file" accept="image/*,video/*" hidden><button class="btn ghost sm" id="pick" type="button">사진 · 동영상 첨부 (선택)</button><span id="upst" style="font-size:13px"></span></div>
+  </section>
+  <div class="savebar"><span class="grow sub" id="st">${S.docs['day_'+S.date]?'저장된 기록이에요':'아직 저장 전이에요'}</span><button class="btn" id="save" type="button">저장하기</button></div>`;
+}
+function mediaHtml(){
+  $('#media').innerHTML=(W.media||[]).map((m,i)=>`<figure>${String(m.ct||'').startsWith('video')?`<video data-mid="${esc(m.id)}" controls playsinline preload="metadata"></video>`:`<img data-mid="${esc(m.id)}" alt="행복했던 순간 사진 ${i+1}">`}<button type="button" data-rm="${i}" aria-label="첨부 지우기">×</button></figure>`).join('');
+  fillMedia($('#media'));
+  $$('#media [data-rm]').forEach(b=>b.onclick=async()=>{const m=W.media.splice(+b.dataset.rm,1)[0];mediaHtml();await commit();if(m){try{await idb('media','readwrite',s=>s.delete(m.id))}catch(e){}}});
+}
+function syncDeep(){
+  const hi=Math.max(W.dep==null?-1:W.dep,W.anx==null?-1:W.anx);
+  $('#deep').hidden=hi<6;$('#care').hidden=hi<9;
+}
+function bRecord(){
+  syncDeep();mediaHtml();
+  $('#dprev').onclick=()=>{flushSave();S.date=addDays(S.date,-1);render()};
+  const nx=$('#dnext');if(nx)nx.onclick=()=>{flushSave();S.date=addDays(S.date,1);render()};
+  $$('.scale button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;W[k]=+b.dataset.v;$$(`.scale button[data-k="${k}"]`).forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on)});syncDeep();queueSave()});
+  $$('[data-f]').forEach(el=>el.oninput=()=>{W[el.dataset.f]=el.value;queueSave()});
+  $$('#q3 .chip').forEach(b=>b.onclick=()=>{const v=b.textContent,i=W.q3.indexOf(v);if(i<0)W.q3.push(v);else W.q3.splice(i,1);b.classList.toggle('on',i<0);b.setAttribute('aria-pressed',i<0);queueSave()});
+  $('#save').onclick=async()=>{await commit();if(!isDone(W))toast('저장했어요. 우울감과 불안감 점수를 모두 고르면 작성 완료가 돼요.');else toast('오늘의 마음을 저장했어요.')};
+  $('#q4help').onclick=async()=>{
+    const box=$('#q4ai'),btn=$('#q4help');btn.textContent='생각하는 중…';
+    const need=W.q3.concat(W.q3etc?[W.q3etc]:[]).join(', ');
+    const r=await askAI(`[오늘 기록] 우울감 ${W.dep}/10, 불안감 ${W.anx}/10
+Q1 힘들게 한 상황: ${W.q1||'(안 씀)'}
+Q2 나의 반응: ${W.q2||'(안 씀)'}
+Q3 필요했던 것: ${need||'(안 고름)'}
+Q4 지금까지 쓴 답: ${W.q4||'(비어 있음)'}
+[할 일] 이 사람이 "지금 이 순간 나를 위해 해줄 수 있는 가장 작은 행동"을 스스로 고르도록 돕는다. 위 상황과 필요에 딱 맞고, 10분 안에 혼자 할 수 있고, 실패하기 어려운 행동 후보 4개를 1인칭 짧은 문장으로 제안한다. Q4에 이미 쓴 답이 있으면 그것을 더 작고 구체적으로 다듬은 후보를 포함한다.
+형식: {"message":"사용자가 쓴 내용을 짚는 1~2문장","suggestions":["...","...","...","..."]}`);
+    btn.textContent='도와줘!';
+    aiBox(box,{ai:!!r,msg:r?r.message:aiWhy(),cues:r&&Array.isArray(r.suggestions)?r.suggestions.slice(0,5):Q4EX,onPick:t=>addTo($('#q4'),t)});
+  };
+  $('#pick').onclick=()=>$('#file').click();
+  $('#file').onchange=async e=>{
+    const f=e.target.files[0];e.target.value='';if(!f)return;const up=$('#upst');
+    if(f.size>150*1024*1024){up.textContent='150MB보다 큰 파일은 넣을 수 없어요. 더 짧은 영상을 골라 주세요.';return}
+    up.textContent='넣는 중…';
+    try{const id='m'+Date.now();await idb('media','readwrite',s=>s.put(f,id));W.media.push({id,ct:f.type});mediaHtml();await commit();up.textContent='첨부했어요'}
+    catch(err){up.textContent='넣지 못했어요. 휴대폰 저장 공간을 확인해 주세요.'}
+  };
+}
+function vEmotions(){
+  W=dayDoc(S.date);
+  return `${top('감정에 이름표 붙이기')}
+  <div class="bubble">${MONG(52)}<div class="say">지금 나는 어떤 감정인가요? 여러 개를 골라도 돼요.</div></div>
+  <section class="card"><p class="sub">${fmtK(S.date)}에 붙인 이름표</p><div class="chips" id="sel"></div>
+  <input type="text" id="enote" data-f="emoNote" placeholder="이 감정에 대해 한 줄 남기기 (선택)" value="${esc(W.emoNote)}" aria-label="감정 메모"></section>
+  <input type="search" id="eq" placeholder="100가지 감정에서 찾기" aria-label="감정 찾기" value="${esc(S.emoQ)}">
+  <div id="elist" style="display:flex;flex-direction:column;gap:12px">${EMO.map(([g,ws])=>`<section class="card" data-g><h3>${g} <span class="sub">${ws.length}개</span></h3><div class="chips">${ws.map(w=>`<button type="button" class="chip l" data-w="${w}">${w}</button>`).join('')}</div></section>`).join('')}</div>
+  <section class="card"><h3>목록에 없는 감정</h3><div class="row"><input type="text" id="ecustom" class="grow" style="width:auto" placeholder="직접 적기" aria-label="감정 직접 적기"><button class="btn lilac sm" id="eadd" type="button">추가</button></div></section>
+  <div class="savebar"><span class="grow sub" id="st"></span><button class="btn lilac" id="save" type="button">이름표 붙이기</button></div>`;
+}
+function bEmotions(){
+  const paint=()=>{
+    $('#sel').innerHTML=W.emotions.length?W.emotions.map(w=>`<button type="button" class="chip l on" data-s="${esc(w)}">${esc(w)} ×</button>`).join(''):'<span class="sub">아직 고른 감정이 없어요.</span>';
+    $$('#sel [data-s]').forEach(b=>b.onclick=()=>tog(b.dataset.s));
+    $$('#elist [data-w]').forEach(b=>{const on=W.emotions.includes(b.dataset.w);b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
+    $('#st').textContent=W.emotions.length+'개 선택';
+  };
+  const tog=w=>{const i=W.emotions.indexOf(w);if(i<0)W.emotions.push(w);else W.emotions.splice(i,1);paint();queueSave();setTimeout(()=>{$('#st').textContent=W.emotions.length+'개 선택'},0)};
+  $$('#elist [data-w]').forEach(b=>b.onclick=()=>tog(b.dataset.w));
+  const filt=()=>{const q=$('#eq').value.trim();S.emoQ=q;$$('#elist [data-g]').forEach(sec=>{let any=false;$$('[data-w]',sec).forEach(b=>{const s=!q||b.dataset.w.includes(q);b.hidden=!s;any=any||s});sec.hidden=!any})};
+  $('#eq').oninput=filt;filt();
+  $('#enote').oninput=e=>{W.emoNote=e.target.value;queueSave()};
+  $('#eadd').onclick=()=>{const v=$('#ecustom').value.trim();if(!v)return;if(!W.emotions.includes(v))W.emotions.push(v);$('#ecustom').value='';paint();queueSave()};
+  $('#save').onclick=async()=>{await commit();toast(W.emotions.length?'감정에 이름표를 붙였어요.':'저장했어요.')};
+  paint();
+}
+/* CBT */
+const cbtList=()=>Object.keys(S.docs).filter(k=>k.startsWith('cbt_')).map(k=>S.docs[k]).sort((a,b)=>b.createdAt-a.createdAt);
+function vCbt(){
+  const c=S.cbt;
+  if(!c){
+    const list=cbtList();
+    return `${top('생각 따라가기')}
+    <div class="bubble">${MONG(52)}<div class="say">행동에서 시작해서 한 단계씩 거슬러 올라가 볼게요. 막히면 도와줘! 버튼을 눌러요.</div></div>
+    <section class="card"><div class="steps">${STEPS.map((s,i)=>`<span>${i+1} ${s.t}</span>`).join('')}</div><p class="sub">행동 → 신체 반응 → 감정 → 생각 → 사건 → 대책 순서로, 앞 단계를 채워야 다음 단계가 열려요.</p><button class="btn mint" id="cnew" type="button">새로 시작하기</button></section>
+    ${list.length?`<h3>지난 기록</h3>${list.map(r=>`<div class="rec"><div class="row"><b class="d grow" style="font-weight:400">${fmtK(r.date)}</b><span class="pill" style="background:${r.done?'var(--mint-soft)':'var(--butter)'}">${r.done?'완료':'작성 중'}</span></div><p>${esc(r.summary||STEPS.map(s=>r.steps[s.k]).filter(Boolean)[0]||'')}</p><div class="row"><button class="btn ghost sm" data-copen="${r.id}" type="button">${r.done?'다시 보기':'이어서 쓰기'}</button><button class="btn ghost sm" data-cdel="${r.id}" type="button">지우기</button></div></div>`).join('')}`:''}`;
+  }
+  if(c.phase==='summary')return `${top('생각 따라가기')}
+    <section class="card"><h3>내가 적은 내용</h3>${STEPS.map(s=>`<div class="ans"><b>${s.t}</b>${esc(c.steps[s.k])}</div>`).join('')}<div><button class="btn ghost sm" id="cedit" type="button">답 고치기</button></div></section>
+    <section class="card"><h3>나의 마음 정리</h3><p class="sub">임시로 정리한 문장이에요. 내 마음과 다르면 고칠 수 있어요.</p>
+    <div class="ai" id="sumbox"><span class="who" id="sumwho">정리하는 중…</span><p id="sumtext">${esc(c.summary||'')}</p></div>
+    <textarea id="sumedit" hidden aria-label="마음 정리 고치기"></textarea>
+    <p class="q">이 문장이 내 마음과 비슷한가요?</p>
+    <div class="row"><button class="btn mint" id="cyes" type="button">네, 비슷해요</button><button class="btn ghost" id="cno" type="button">조금 달라요</button></div></section>`;
+  const s=STEPS[c.i],v=c.steps[s.k]||'';
+  return `${top('생각 따라가기')}
+  <div class="steps">${STEPS.map((x,i)=>`<span class="${i<c.i?'done':i===c.i?'now':''}">${i<c.i?'✓':i+1} ${x.t}</span>`).join('')}</div>
+  ${c.i?`<section class="card" style="gap:8px"><p class="sub">지금까지 적은 내용</p>${STEPS.slice(0,c.i).map(x=>`<div class="ans"><b>${x.t}</b>${esc(c.steps[x.k])}</div>`).join('')}</section>`:''}
+  <section class="card"><p class="sub">${c.i+1}단계 · ${s.t}</p><label class="q" for="cans">${s.q}</label>
+  <textarea id="cans">${esc(v)}</textarea><p class="err" id="cerr" hidden>한 줄이라도 적어야 다음 단계로 갈 수 있어요. 막히면 도와줘!를 눌러 보세요.</p>
+  <p class="ex">예) ${s.ex}</p>
+  <div class="row"><button class="btn lilac sm" id="chelp" type="button">도와줘!</button><span class="sub">생각이 안 날 때 작은 단서를 줘요</span></div>
+  <div class="ai" id="cai" hidden></div>
+  <div class="row">${c.i?'<button class="btn ghost" id="cprev" type="button">이전 단계</button>':''}<button class="btn mint grow" id="cnext" type="button">${c.i===5?'마음 정리하기':'다음 단계로'}</button></div></section>`;
+}
+async function saveCbt(){const c=S.cbt;S.docs['cbt_'+c.id]={kind:'cbt',id:c.id,date:c.date,createdAt:c.createdAt,steps:clone(c.steps),summary:c.summary||'',done:!!c.done};return persist('cbt_'+c.id)}
+const stepsText=(c,upto)=>STEPS.slice(0,upto).map(s=>`${s.t}: ${c.steps[s.k]||'(비어 있음)'}`).join('\n');
+function tmplSummary(c){const t=c.steps;return `"${t.event}" 일이 있은 뒤로 "${t.thought}"라는 생각을 하게 된 것 같아요. 그래서 ${t.emotion} 마음이 들고, 몸은 ${t.body} 상태이고, ${t.behavior} 것 같아요. 그래서 "${t.plan}"부터 해 보려고 해요.`}
+function bCbt(){
+  const c=S.cbt;
+  if(!c){
+    $('#cnew').onclick=()=>{const now=Date.now();S.cbt={id:String(now),date:today(),createdAt:now,steps:{},i:0,phase:'steps'};render()};
+    $$('[data-copen]').forEach(b=>b.onclick=()=>{const r=clone(S.docs['cbt_'+b.dataset.copen]);const i=STEPS.findIndex(s=>!r.steps[s.k]);S.cbt=Object.assign(r,{i:i<0?5:i,phase:i<0?'summary':'steps'});render()});
+    $$('[data-cdel]').forEach(b=>b.onclick=()=>{if(b.dataset.sure){removeDoc('cbt_'+b.dataset.cdel).then(render)}else{b.dataset.sure=1;b.textContent='정말 지울까요? 한 번 더 누르기'}});
+    return;
+  }
+  if(c.phase==='summary'){
+    const show=(t,ai)=>{c.summary=t;$('#sumtext').textContent=t;$('#sumwho').textContent=ai?'AI 도우미가 정리한 임시 문장':'임시로 정리한 문장'};
+    if(c.summary)show(c.summary,false);
+    else askAI(`[사용자가 단계별로 적은 내용]\n${stepsText(c,6)}\n[할 일] 위 내용만으로 "나의 마음 정리"를 2~3문장, 사용자의 1인칭 목소리로 쓴다. 사건 → 생각 → 감정 → 신체 반응과 행동 → 대책의 흐름이 보이게 하되, 사용자가 쓰지 않은 원인이나 감정을 덧붙이지 않는다. "~인 것 같아요" 같은 임시 표현을 쓴다.\n형식: {"summary":"..."}`).then(r=>{if(S.cbt===c&&$('#sumtext'))show(r&&r.summary?String(r.summary):tmplSummary(c),!!(r&&r.summary))});
+    $('#cedit').onclick=()=>{c.phase='steps';c.i=0;c.summary='';render()};
+    $('#cno').onclick=()=>{const ta=$('#sumedit');ta.hidden=false;ta.value=c.summary||'';$('#sumbox').hidden=true;ta.focus();$('#cyes').textContent='이렇게 저장하기';$('#cno').hidden=true};
+    $('#cyes').onclick=async()=>{const ta=$('#sumedit');if(!ta.hidden)c.summary=ta.value.trim();if(!c.summary){toast('정리 문장을 만드는 중이에요. 잠시만요.');return}c.done=true;await saveCbt();S.cbt=null;render();toast('마음 정리를 저장했어요. 여기까지 온 것만으로도 큰 걸음이에요.')};
+    return;
+  }
+  const s=STEPS[c.i],ta=$('#cans');
+  ta.oninput=()=>{c.steps[s.k]=ta.value;$('#cerr').hidden=true};
+  $('#cnext').onclick=async()=>{const v=ta.value.trim();if(!v){$('#cerr').hidden=false;ta.focus();return}c.steps[s.k]=v;if(c.i===5){c.phase='summary';c.summary=''}else c.i++;await saveCbt();render()};
+  const pv=$('#cprev');if(pv)pv.onclick=()=>{c.steps[s.k]=ta.value.trim();c.i--;render()};
+  $('#chelp').onclick=async()=>{
+    const btn=$('#chelp');btn.textContent='생각하는 중…';
+    const r=await askAI(`[인지행동치료 단계별 기록: 행동 → 신체 반응 → 감정 → 생각 → 사건 → 대책]\n[앞 단계에서 사용자가 적은 내용]\n${c.i?stepsText(c,c.i):'(아직 없음, 첫 단계)'}\n[지금 단계] ${c.i+1}단계 "${s.t}" — 질문: ${s.q}\n[이 칸에 지금까지 쓴 것] ${ta.value.trim()||'(비어 있음)'}\n[할 일] 사용자가 이 단계의 답을 스스로 떠올리도록 돕는다. 앞 단계에서 쓴 표현을 그대로 짚어 주고, 이 단계에 해당하는 것만 다룬다(다음 단계 내용을 미리 말하지 않는다). cues는 사용자가 "맞아, 이거야" 하고 고를 수 있는 1인칭 짧은 표현 4~5개이고, 서로 다른 방향이어야 하며 마지막은 "잘 모르겠어요"로 한다. ${s.k==='plan'?'대책은 내일까지 할 수 있는 아주 작고 구체적인 행동이어야 한다.':''}\n형식: {"message":"앞 내용을 짚는 1~2문장","question":"떠올리는 데 도움이 되는 질문 1개","cues":["..."]}`);
+    btn.textContent='도와줘!';
+    aiBox($('#cai'),{ai:!!r,msg:r?r.message:aiWhy(),question:r?r.question:'',cues:r&&Array.isArray(r.cues)&&r.cues.length?r.cues.slice(0,6):s.cues,onPick:t=>{if(t!=='잘 모르겠어요')addTo(ta,t);else toast('괜찮아요. 떠오르는 만큼만 한 단어로 적어도 돼요.')}});
+  };
+}
+/* graph */
+function drawChart(cv,dates,w,h){
+  const dpr=Math.min(window.devicePixelRatio||1,2);cv.width=w*dpr;cv.height=h*dpr;cv.style.width=w+'px';cv.style.height=h+'px';
+  const g=cv.getContext('2d');g.scale(dpr,dpr);g.clearRect(0,0,w,h);
+  const L=30,R=12,T=12,B=26,pw=w-L-R,ph=h-T-B,n=dates.length;
+  const X=i=>L+(n>1?pw*i/(n-1):pw/2),Y=v=>T+ph*(1-v/10);
+  g.font='12px "Gowun Dodum",sans-serif';g.fillStyle='#946577';g.strokeStyle='#F7D3DF';g.lineWidth=1;g.textAlign='right';g.textBaseline='middle';
+  for(let v=0;v<=10;v+=2){g.beginPath();g.moveTo(L,Y(v));g.lineTo(w-R,Y(v));g.stroke();g.fillText(v,L-8,Y(v))}
+  g.setLineDash([3,4]);g.strokeStyle='#E8A0B8';g.beginPath();g.moveTo(L,Y(6));g.lineTo(w-R,Y(6));g.stroke();g.setLineDash([]);
+  g.textAlign='center';g.textBaseline='top';const every=Math.max(1,Math.ceil(n/8));
+  dates.forEach((d,i)=>{if(i%every===0||i===n-1&&i%every>every/2)g.fillText(n>31?d.slice(5).replace('-','/'):+d.slice(8),X(i),h-B+8)});
+  [['dep','#D9557F',[]],['anx','#7468D6',[6,4]]].forEach(([k,col,dash])=>{
+    const pts=dates.map((d,i)=>{const x=S.docs['day_'+d];return x&&x[k]!=null?[X(i),Y(x[k])]:null});
+    g.strokeStyle=col;g.fillStyle=col;g.lineWidth=2.5;g.setLineDash(dash);g.beginPath();let pen=false;
+    pts.forEach(p=>{if(!p){pen=false;return}if(pen)g.lineTo(p[0],p[1]);else g.moveTo(p[0],p[1]);pen=true});g.stroke();g.setLineDash([]);
+    pts.forEach(p=>{if(p){g.beginPath();g.arc(p[0],p[1],3.2,0,7);g.fill()}});
+  });
+}
+const monthDates=m=>{const [y,mo]=m.split('-').map(Number),n=new Date(y,mo,0).getDate();return Array.from({length:n},(_,i)=>m+'-'+pad(i+1))};
+function vGraph(){
+  const ds=monthDates(S.month),docs=ds.map(d=>S.docs['day_'+d]).filter(isDone),[y,mo]=S.month.split('-').map(Number);
+  const avg=k=>docs.length?(docs.reduce((a,d)=>a+d[k],0)/docs.length).toFixed(1):'–';
+  const first=new Date(y,mo-1,1).getDay();
+  return `${top('월별 그래프')}
+  <div class="datenav"><button id="mprev" type="button" aria-label="이전 달">‹</button><div><h3>${y}년 ${mo}월</h3><span class="sub">기록한 날 ${docs.length}일</span></div>${S.month>=today().slice(0,7)?'<span style="width:38px"></span>':'<button id="mnext" type="button" aria-label="다음 달">›</button>'}</div>
+  <section class="card"><div class="legend"><span><i></i>우울감 (평균 ${avg('dep')})</span><span><i class="a"></i>불안감 (평균 ${avg('anx')})</span><span>점선은 6점</span></div><div id="cvw"><canvas id="cv" role="img" aria-label="${mo}월 우울감과 불안감 점수 그래프"></canvas></div>${docs.length?'':'<p class="sub">이 달에는 아직 기록이 없어요.</p>'}</section>
+  <section class="card"><h3>작성한 날</h3><div class="cal">${WD.map(w=>`<span>${w}</span>`).join('')}${'<span></span>'.repeat(first)}${ds.map(d=>{const x=S.docs['day_'+d],dn=isDone(x),hi=dn&&Math.max(x.dep,x.anx)>=6;return `<span class="${hi?'hi':dn?'w':''}">${+d.slice(8)}</span>`}).join('')}</div><p class="sub">연한 분홍은 기록한 날, 진한 분홍은 6점 이상이었던 날이에요.</p></section>`;
+}
+function bGraph(){
+  const mv=n=>{const [y,m]=S.month.split('-').map(Number),d=new Date(y,m-1+n,1);S.month=d.getFullYear()+'-'+pad(d.getMonth()+1);render()};
+  $('#mprev').onclick=()=>mv(-1);const nx=$('#mnext');if(nx)nx.onclick=()=>mv(1);
+  drawChart($('#cv'),monthDates(S.month),Math.max(260,$('#cvw').clientWidth),220);
+}
+/* pdf */
+function vPdf(){
+  const t=today();
+  return `${top('PDF 만들기')}
+  <section class="card"><p>기간을 고르면 점수 그래프, 날짜별 기록, 감정 이름표, 생각 따라가기 기록이 한 파일로 정리돼요. 상담에 가져가기 좋아요.</p>
+  <label for="pf">시작일</label><input type="date" id="pf" value="${addDays(t,-29)}" max="${t}">
+  <label for="pt">종료일</label><input type="date" id="pt" value="${t}" max="${t}">
+  <p class="err" id="perr" hidden></p>
+  <button class="btn" id="pgo" type="button">PDF 만들기</button><p class="sub" id="pst">사진은 PDF에 들어가고, 동영상은 "동영상 첨부 있음"으로 표시돼요.</p></section>`;
+}
+function bPdf(){
+  $('#pgo').onclick=async()=>{
+    const f=$('#pf').value,t=$('#pt').value,err=$('#perr'),st=$('#pst');err.hidden=true;
+    if(!f||!t||f>t){err.textContent='시작일이 종료일보다 늦어요. 날짜를 다시 골라 주세요.';err.hidden=false;return}
+    if((toDate(t)-toDate(f))/864e5>366){err.textContent='한 번에 1년까지만 만들 수 있어요.';err.hidden=false;return}
+    if(!window.html2canvas||!window.jspdf){err.textContent='PDF 도구를 불러오지 못했어요. 인터넷에 연결한 뒤 앱을 다시 열어 주세요.';err.hidden=false;return}
+    const btn=$('#pgo');btn.textContent='만드는 중…';
+    try{
+      let blob;try{blob=await buildPdf(f,t,true,st)}catch(e){st.textContent='사진을 넣지 못해 사진 없이 다시 만드는 중…';blob=await buildPdf(f,t,false,st)}
+      saveFile(blob,`마음기록_${f}_${t}.pdf`);st.textContent='PDF를 다운로드 폴더에 저장했어요.';
+    }catch(e){st.textContent='PDF를 만들지 못했어요. 기간을 줄여서 다시 시도해 주세요.'}
+    btn.textContent='PDF 만들기';$('#pdfroot').innerHTML='';
+  };
+}
+function saveFile(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),60000)}
+async function buildPdf(f,t,photos,st){
+  const root=$('#pdfroot'),ds=[];for(let d=f;d<=t;d=addDays(d,1))ds.push(d);
+  const days=ds.map(d=>S.docs['day_'+d]).filter(Boolean),cb=cbtList().filter(r=>r.date>=f&&r.date<=t).reverse();
+  const kv=(k,v)=>v?`<div class="pk">${k}</div><div>${esc(v).replace(/\n/g,'<br>')}</div>`:'';
+  root.innerHTML=`<div class="pb"><h1>마음 기록지</h1><p>${esc(settings().name||'')} · ${fmtK(f)} ~ ${fmtK(t)} · 기록한 날 ${days.filter(isDone).length}일</p></div>
+  <div class="pb"><h2>우울감 · 불안감 변화</h2><p style="font-size:12.5px;color:#946577">분홍 실선은 우울감, 보라 점선은 불안감, 가는 점선은 6점</p><canvas id="pcv"></canvas></div>
+  ${days.map(d=>`<div class="pb"><div class="pd"><h2>${fmtK(d.date)}</h2><p>주관적 우울감 <b>${d.dep==null?'–':d.dep}</b> / 10 · 주관적 불안감 <b>${d.anx==null?'–':d.anx}</b> / 10</p>
+   ${kv('Q1. 마음을 가장 힘들게 만든 상황이나 사건',d.q1)}${kv('Q2. 그 상황에서 나의 반응',d.q2)}${kv('Q3. 그 순간 가장 필요했던 것',(d.q3||[]).concat(d.q3etc?[d.q3etc]:[]).join(', '))}${kv('Q4. 나를 위한 가장 작은 행동',d.q4)}
+   ${kv('감정 이름표',(d.emotions||[]).join(', '))}${kv('감정 메모',d.emoNote)}
+   ${kv('행복했던 순간',d.h1)}${kv('그때의 기분',d.h2)}${kv('기억하고 싶은 이유',d.h3)}
+   ${(d.media||[]).length?`<div>${d.media.map(m=>String(m.ct||'').startsWith('video')?'<span class="pk">동영상 첨부 있음 </span>':photos?`<img data-mid="${esc(m.id)}">`:'<span class="pk">사진 첨부 있음 </span>').join('')}</div>`:''}</div></div>`).join('')}
+  ${cb.map(r=>`<div class="pb"><div class="pd"><h2>생각 따라가기 · ${fmtK(r.date)}</h2>${STEPS.map(s=>kv(s.t,r.steps[s.k])).join('')}${kv('나의 마음 정리',r.summary)}</div></div>`).join('')}
+  ${settings().credit?`<div class="pb"><p style="text-align:center;color:#946577">${esc(settings().credit)}</p></div>`:''}`;
+  drawChart($('#pcv'),ds,740,240);
+  await fillMedia(root);
+  await Promise.all($$('img',root).map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r;setTimeout(r,8000)})));
+  $$('img',root).forEach(im=>{if(!im.naturalWidth)im.remove()});
+  if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+  const {jsPDF}=window.jspdf,pdf=new jsPDF({unit:'pt',format:'a4'}),PW=595.28,PH=841.89,M=36,cw=PW-2*M,maxH=PH-2*M;let y=M;
+  const blocks=$$('.pb',root);
+  for(let i=0;i<blocks.length;i++){
+    st.textContent=`만드는 중… ${i+1} / ${blocks.length}`;
+    const c=await html2canvas(blocks[i],{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false});
+    const hpt=c.height*cw/c.width;
+    if(hpt<=maxH){if(y+hpt>PH-M){pdf.addPage();y=M}pdf.addImage(c.toDataURL('image/jpeg',.92),'JPEG',M,y,cw,hpt);y+=hpt+6}
+    else{const pxp=Math.floor(maxH*c.width/cw);for(let off=0;off<c.height;off+=pxp){if(y>M){pdf.addPage();y=M}const hh=Math.min(pxp,c.height-off),tc=document.createElement('canvas');tc.width=c.width;tc.height=hh;const g=tc.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,tc.width,hh);g.drawImage(c,0,off,c.width,hh,0,0,c.width,hh);pdf.addImage(tc.toDataURL('image/jpeg',.92),'JPEG',M,y,cw,hh*cw/c.width);y=M+hh*cw/c.width+6}}
+  }
+  return pdf.output('blob');
+}
+/* settings */
+function vSettings(){
+  const st=settings(),np=('Notification' in window)?Notification.permission:'none';
+  return `${top('설정')}
+  <section class="card"><label class="q" for="sname">홈 화면에서 부를 이름</label><input type="text" id="sname" value="${esc(st.name||'')}" placeholder="이름">
+  <p class="q">홈 화면에 넣을 내 사진</p><div class="row"><input type="file" id="avfile" accept="image/*" hidden><button class="btn ghost sm" id="avpick" type="button">사진 고르기</button>${st.avatar?'<button class="btn ghost sm" id="avdel" type="button">사진 빼기</button>':''}<span class="sub" id="avst">${st.avatar?'사진이 들어가 있어요':'아직 없어요'}</span></div>
+  <label class="q" for="scredit">홈 화면 아래 문구</label><input type="text" id="scredit" value="${esc(st.credit||'')}" placeholder="Crafted by. ...">
+  <p class="sub">이름, 사진, 문구는 이 휴대폰에만 저장되고 인터넷에 올라가지 않아요.</p>
+  <label class="q" for="srem">미작성 알림 시각</label><input type="time" id="srem" value="${esc(st.rem||'00:00')}">
+  <p class="sub">이 시각이 지났는데 그날 기록이 없으면 홈 화면에 알림 배너가 떠요. 정오 이전 시각(예: 밤 12시)으로 두면 전날 기록을 확인해요.</p>
+  <label class="row"><input type="checkbox" id="soff" ${st.remOff?'checked':''}> 알림 끄기</label>
+  <div class="row"><button class="btn ghost sm" id="snoti" type="button">휴대폰 알림 허용하기</button><span class="sub" id="snst">${np==='granted'?'허용됨':np==='denied'?'차단됨 (휴대폰 설정에서 풀 수 있어요)':np==='none'?'이 브라우저는 지원하지 않아요':'아직 허용 전'}</span></div>
+  <p class="sub">휴대폰 알림은 앱이 켜져 있거나 최근 앱 목록에 남아 있을 때만 울려요. 앱을 완전히 닫으면 울리지 않아요.</p></section>
+  <section class="card"><h3>AI 도우미 (도와줘! 버튼)</h3>
+  <label class="q" for="skey">Gemini API 키</label><input type="text" id="skey" value="${esc(st.key||'')}" placeholder="AIza..." autocomplete="off">
+  <label class="q" for="smodel">모델 이름</label><input type="text" id="smodel" value="${esc(st.model||'')}" placeholder="gemini-2.5-flash">
+  <p class="sub">키는 이 휴대폰에만 저장돼요. 도와줘!를 누를 때 내가 쓴 글이 Google Gemini로 전송돼요.</p></section>
+  <button class="btn" id="ssave" type="button">설정 저장하기</button>
+  <section class="card"><h3>기록 보관과 백업</h3><p class="sub">기록과 사진은 이 휴대폰 안에만 저장돼요. 코드를 고쳐도 기록은 그대로 남지만, 크롬의 사이트 데이터를 지우거나 휴대폰을 바꾸면 사라져요. 가끔 백업 파일을 받아 두세요. 백업에는 글과 점수만 들어가고 사진·동영상은 들어가지 않아요.</p>
+  <div class="row"><button class="btn ghost sm" id="bexp" type="button">백업 파일 저장</button><input type="file" id="bfile" accept="application/json,.json" hidden><button class="btn ghost sm" id="bimp" type="button">백업 파일 불러오기</button></div></section>
+  `;
+}
+function bSettings(){
+  $('#avpick').onclick=()=>$('#avfile').click();
+  $('#avfile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+    try{await idb('media','readwrite',s=>s.put(f,'avatar'));if(URLS.avatar){URL.revokeObjectURL(URLS.avatar);delete URLS.avatar}S.docs.settings=Object.assign(settings(),{avatar:true});await persist('settings');$('#avst').textContent='사진을 넣었어요'}
+    catch(err){$('#avst').textContent='사진을 넣지 못했어요'}};
+  const ad=$('#avdel');if(ad)ad.onclick=async()=>{try{await idb('media','readwrite',s=>s.delete('avatar'))}catch(e){}delete URLS.avatar;S.docs.settings=Object.assign(settings(),{avatar:false});await persist('settings');render()};
+  $('#ssave').onclick=async()=>{S.docs.settings={kind:'settings',name:$('#sname').value.trim(),credit:$('#scredit').value.trim(),avatar:settings().avatar,rem:$('#srem').value||'00:00',remOff:$('#soff').checked,key:$('#skey').value.trim(),model:$('#smodel').value.trim()||'gemini-2.5-flash'};const ok=await persist('settings');if(ok)toast('설정을 저장했어요.')};
+  $('#snoti').onclick=async()=>{if(!('Notification' in window)){toast('이 브라우저는 알림을 지원하지 않아요.');return}const p=await Notification.requestPermission();$('#snst').textContent=p==='granted'?'허용됨':'허용되지 않았어요'};
+  $('#bexp').onclick=()=>{const d=clone(S.docs);if(d.settings)delete d.settings.key;saveFile(new Blob([JSON.stringify(d)],{type:'application/json'}),'마음기록_백업_'+today()+'.json');toast('백업 파일을 저장했어요.')};
+  $('#bimp').onclick=()=>$('#bfile').click();
+  $('#bfile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+    try{const d=JSON.parse(await f.text());let n=0;for(const k of Object.keys(d)){if(!/^(day_|cbt_|settings$)/.test(k))continue;if(k==='settings')d[k].key=settings().key;if(k.startsWith('day_'))d[k].media=(S.docs[k]&&S.docs[k].media)||[];S.docs[k]=d[k];await persist(k);n++}toast('기록 '+n+'개를 불러왔어요.')}
+    catch(err){toast('백업 파일을 읽지 못했어요. 이 앱에서 저장한 파일인지 확인해 주세요.')}};
+}
+const VIEWS={home:vHome,record:vRecord,emotions:vEmotions,cbt:vCbt,graph:vGraph,pdf:vPdf,settings:vSettings};
+const BIND={record:bRecord,emotions:bEmotions,cbt:bCbt,graph:bGraph,pdf:bPdf,settings:bSettings};
+function render(){$('#app').innerHTML=VIEWS[S.view]();if(BIND[S.view])BIND[S.view]();if(S.view==='home'&&IDB)fillMedia($('.hero'));window.scrollTo(0,0)}
+function go(v,date){
+  if(!S.loaded){toast('기록을 불러오는 중이에요. 잠시만요.');return}
+  flushSave();if(v==='home')S.cbt=null;if(date)S.date=date;S.view=v;render();
+}
+$('#app').addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return}
+  const o=e.target.closest('[data-open]');if(o){go(o.dataset.open,today());return}
+  if(e.target.closest('#remgo')){go('record',reminderTarget()||today())}
+});
+let lastDay=today();
+function notifyCheck(){
+  const rt=reminderTarget();if(!rt||!('Notification' in window)||Notification.permission!=='granted'||!navigator.serviceWorker)return;
+  let last='';try{last=localStorage.getItem('maum_notified')||''}catch(e){}
+  if(last===rt)return;try{localStorage.setItem('maum_notified',rt)}catch(e){}
+  navigator.serviceWorker.ready.then(r=>r.showNotification('마음 기록',{body:(rt===today()?'오늘':'어제')+' 마음 기록이 아직 없어요. 자기 전에 잠깐 적어 볼까요?',icon:'icon-192.png',badge:'icon-192.png',tag:'maum'})).catch(()=>{});
+}
+setInterval(()=>{notifyCheck();if(S.view==='home'&&!document.hidden)render()},60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&S.view==='home')render();if(document.hidden)flushSave()});
+boot();
+</script>
+</body>
+</html>
