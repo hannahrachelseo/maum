@@ -43,7 +43,9 @@ textarea{min-height:84px;resize:vertical}
 .back{font-family:var(--display);background:#fff;border-radius:999px;padding:6px 14px;color:var(--rose);box-shadow:0 2px 0 var(--line)}
 .hero{display:flex;gap:12px;align-items:center}
 .hero svg{flex:none}
-.av{width:88px;height:88px;border-radius:50%;object-fit:cover;flex:none;border:3px solid #F9C9D6;background:#FDE9E6}
+.av{margin:9px;width:92px;height:92px;border-radius:50%;object-fit:cover;flex:none;border:4px solid #F9C9D6;background:#FDE9E6;transition:filter .4s}
+.av.low{filter:grayscale(.6) brightness(.96);border-color:#CFC8D8}
+.av.good{border-color:#F08FB0;box-shadow:0 0 0 6px #FCE4EC,0 0 0 9px #FFF0CC}
 .bubble{display:flex;gap:10px;align-items:flex-end}
 .bubble .say{background:#fff;border-radius:18px 18px 18px 4px;padding:10px 14px;box-shadow:0 2px 0 var(--line);font-size:14px}
 .note{background:var(--butter);color:var(--butter-ink);border-radius:16px;padding:10px 14px;font-size:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
@@ -176,7 +178,7 @@ const PERSONA=`너는 인지행동치료(CBT)와 상처 회복을 30년 넘게 �
 출력은 설명 없이 JSON 하나만.`;
 
 /* ---------- illustrations (original drawings) ---------- */
-const MONG=(s=64)=>`<svg width="${s}" height="${s}" viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="74" rx="20" ry="3.5" fill="#F7D3DF"/><path d="M24 22c-5-9 2-17 8-10 3 3 3 8 2 12zM56 22c5-9-2-17-8-10-3 3-3 8-2 12z" fill="#fff" stroke="#F3B9CB" stroke-width="2"/><path d="M40 16c17 0 28 12 28 28S57 72 40 72 12 60 12 44s11-28 28-28z" fill="#fff" stroke="#F3B9CB" stroke-width="2"/><circle cx="30" cy="42" r="3" fill="#4A2B38"/><circle cx="50" cy="42" r="3" fill="#4A2B38"/><circle cx="31" cy="41" r="1" fill="#fff"/><circle cx="51" cy="41" r="1" fill="#fff"/><ellipse cx="23" cy="50" rx="5" ry="3.2" fill="#FBB9CC"/><ellipse cx="57" cy="50" rx="5" ry="3.2" fill="#FBB9CC"/><path d="M36 49q4 4 8 0" fill="none" stroke="#D9557F" stroke-width="2" stroke-linecap="round"/><path d="M40 12c-3-5-9-1-5 4l5 4 5-4c4-5-2-9-5-4z" fill="#D9557F"/></svg>`;
+const MONG=(s=64,m='')=>`<svg width="${s}" height="${s}" viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="74" rx="20" ry="3.5" fill="#F7D3DF"/><path d="M24 22c-5-9 2-17 8-10 3 3 3 8 2 12zM56 22c5-9-2-17-8-10-3 3-3 8-2 12z" fill="#fff" stroke="#F3B9CB" stroke-width="2"/><path d="M40 16c17 0 28 12 28 28S57 72 40 72 12 60 12 44s11-28 28-28z" fill="#fff" stroke="#F3B9CB" stroke-width="2"/><circle cx="30" cy="42" r="3" fill="#4A2B38"/><circle cx="50" cy="42" r="3" fill="#4A2B38"/><circle cx="31" cy="41" r="1" fill="#fff"/><circle cx="51" cy="41" r="1" fill="#fff"/><ellipse cx="23" cy="50" rx="5" ry="3.2" fill="#FBB9CC"/><ellipse cx="57" cy="50" rx="5" ry="3.2" fill="#FBB9CC"/>${m==='good'?'<path d="M33 47q7 8 14 0z" fill="#D9557F"/><path d="M8 20l2 5 5 2-5 2-2 5-2-5-5-2 5-2zM72 26l1.5 3.5L77 31l-3.5 1.5L72 36l-1.5-3.5L67 31l3.5-1.5z" fill="#F7B955"/>':m==='low'?'<path d="M36 51q4-3 8 0" fill="none" stroke="#D9557F" stroke-width="2" stroke-linecap="round"/><path d="M25 35l8 2M55 35l-8 2" stroke="#4A2B38" stroke-width="1.6" stroke-linecap="round"/>':'<path d="M36 49q4 4 8 0" fill="none" stroke="#D9557F" stroke-width="2" stroke-linecap="round"/>'}<path d="M40 12c-3-5-9-1-5 4l5 4 5-4c4-5-2-9-5-4z" fill="#D9557F"/></svg>`;
 const ICO={heart:'<path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/>',tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="8" cy="9" r="1.5"/>',stairs:'<path d="M4 20h4v-4h4v-4h4V8h4"/>',lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'};
 const ico=(n,c)=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[n]}</svg>`;
 
@@ -194,10 +196,11 @@ async function persist(key){
 async function removeDoc(key){delete S.docs[key];if(IDB){try{await idb('docs','readwrite',s=>s.delete(key))}catch(e){}}}
 async function mediaUrl(id){if(URLS[id])return URLS[id];try{const b=await idb('media','readonly',s=>s.get(id));return b?(URLS[id]=URL.createObjectURL(b)):''}catch(e){return ''}}
 async function fillMedia(root){await Promise.all($$('[data-mid]',root).map(async el=>{const u=await mediaUrl(el.dataset.mid);if(u)el.src=u;else el.remove()}))}
-const settings=()=>Object.assign({kind:'settings',name:'',credit:'',avatar:false,rem:'00:00',remOff:false,key:'',model:'gemini-2.5-flash'},S.docs.settings||{});
+const settings=()=>Object.assign({kind:'settings',name:'',credit:'',avatar:false,avatar2:false,rem:'00:00',remOff:false,key:'',model:'gemini-2.5-flash'},S.docs.settings||{});
 const blankDay=date=>({kind:'day',date,dep:null,anx:null,q1:'',q2:'',q3:[],q3etc:'',q4:'',h1:'',h2:'',h3:'',media:[],emotions:[],emoNote:''});
 const dayDoc=date=>Object.assign(blankDay(date),S.docs['day_'+date]||{});
 const isDone=d=>!!d&&d.dep!=null&&d.anx!=null;
+const mood=()=>{const d=S.docs['day_'+today()];return !isDone(d)?'':Math.max(d.dep,d.anx)>=6?'low':'good'};
 function queueSave(){setSt('쓰는 중…');clearTimeout(saveT);saveT=setTimeout(commit,1300)}
 async function commit(){
   clearTimeout(saveT);saveT=null;if(!W)return;
@@ -253,9 +256,10 @@ function reminderTarget(){
 function vHome(){
   const t=today(),done=isDone(S.docs['day_'+t]),st=settings(),rt=reminderTarget(),n=streak(),hr=new Date().getHours();
   const emoN=(dayDoc(t).emotions||[]).length;
-  const say=!S.loaded?'기록을 불러오고 있어요. 잠시만요.':done?'오늘도 마음을 들여다봤네요. 그것만으로 충분히 잘했어요.':hr<11?'좋은 아침이에요. 오늘 마음은 천천히 살펴봐도 돼요.':hr<18?'오늘 하루는 어떻게 흘러가고 있나요?':'오늘 하루도 애썼어요. 자기 전에 마음을 한 번 적어 볼까요?';
-  return `<div class="hero"><div class="grow"><p class="sub">${fmtK(t)}</p><h1>${st.name?esc(st.name)+'야,<br>':''}오늘 마음은 어때?</h1></div>${st.avatar?'<img class="av" data-mid="avatar" alt="내 사진">':''}</div>
-  <div class="bubble">${MONG(60)}<div class="say">${say}</div></div>
+  const md=mood();
+  const say=!S.loaded?'기록을 불러오고 있어요. 잠시만요.':md==='low'?'오늘 많이 힘들었죠. 여기까지 적은 것만으로도 충분해요. 내가 옆에 있을게요.':md==='good'?'오늘 마음이 한결 가벼워 보여요. 이 느낌을 기억해 둬요.':hr<11?'좋은 아침이에요. 오늘 마음은 천천히 살펴봐도 돼요.':hr<18?'오늘 하루는 어떻게 흘러가고 있나요?':'오늘 하루도 애썼어요. 자기 전에 마음을 한 번 적어 볼까요?';
+  return `<div class="hero"><div class="grow"><p class="sub">${fmtK(t)}</p><h1>${st.name?esc(st.name)+'야,<br>':''}오늘 마음은 어때?</h1></div>${st.avatar?`<img class="av ${md}" data-mid="${md==='good'&&st.avatar2?'avatar2':'avatar'}" alt="내 사진">`:''}</div>
+  <div class="bubble">${MONG(60,md)}<div class="say">${say}</div></div>
   ${rt?`<div class="note"><span>${rt===t?'오늘':'어제'} 마음 기록이 아직 없어요.</span><button class="btn sm" id="remgo" type="button">지금 쓰기</button></div>`:''}
   <button class="bn r" data-open="record" type="button"><span class="ic">${ico('heart','#D9557F')}</span><span class="grow"><b>오늘의 마음 기록</b><span>${n?`연속 ${n}일째 · `:''}매일 작성</span></span><span class="pill ${done?'ok':''}">${done?'작성 완료':'미작성'}</span></button>
   <button class="bn l" data-open="emotions" type="button"><span class="ic">${ico('tag','#7468D6')}</span><span class="grow"><b>감정에 이름표 붙이기</b><span>감정 100가지${emoN?` · 오늘 ${emoN}개 붙였어요`:''}</span></span></button>
@@ -519,7 +523,9 @@ function vSettings(){
   const st=settings(),np=('Notification' in window)?Notification.permission:'none';
   return `${topBar('설정')}
   <section class="card"><label class="q" for="sname">홈 화면에서 부를 이름</label><input type="text" id="sname" value="${esc(st.name||'')}" placeholder="이름">
-  <p class="q">홈 화면에 넣을 내 사진</p><div class="row"><input type="file" id="avfile" accept="image/*" hidden><button class="btn ghost sm" id="avpick" type="button">사진 고르기</button>${st.avatar?'<button class="btn ghost sm" id="avdel" type="button">사진 빼기</button>':''}<span class="sub" id="avst">${st.avatar?'사진이 들어가 있어요':'아직 없어요'}</span></div>
+  <p class="q">홈 화면에 넣을 내 사진</p>
+  ${[['avatar','평소 사진'],['avatar2','행복 모드 사진 (웃는 사진)']].map(([k,l])=>`<div class="row"><span class="grow">${l}</span><button class="btn ghost sm" data-avpick="${k}" type="button">${st[k]?'바꾸기':'고르기'}</button>${st[k]?`<button class="btn ghost sm" data-avdel="${k}" type="button">빼기</button>`:''}</div>`).join('')}
+  <input type="file" id="avfile" accept="image/*" hidden><p class="sub" id="avst">오늘 점수가 둘 다 5점 이하면 행복 모드 사진으로 바뀌고 테두리가 반짝여요. 6점 이상인 날은 평소 사진이 차분한 색으로 보여요. 기록 전에는 평소 사진이 그대로 나와요.</p>
   <label class="q" for="scredit">홈 화면 아래 문구</label><input type="text" id="scredit" value="${esc(st.credit||'')}" placeholder="Crafted by. ...">
   <p class="sub">이름, 사진, 문구는 이 휴대폰에만 저장되고 인터넷에 올라가지 않아요.</p>
   <label class="q" for="srem">미작성 알림 시각</label><input type="time" id="srem" value="${esc(st.rem||'00:00')}">
@@ -537,12 +543,13 @@ function vSettings(){
   `;
 }
 function bSettings(){
-  $('#avpick').onclick=()=>$('#avfile').click();
+  let avKey='avatar';
+  $$('[data-avpick]').forEach(b=>b.onclick=()=>{avKey=b.dataset.avpick;$('#avfile').click()});
   $('#avfile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
-    try{await idb('media','readwrite',s=>s.put(f,'avatar'));if(URLS.avatar){URL.revokeObjectURL(URLS.avatar);delete URLS.avatar}S.docs.settings=Object.assign(settings(),{avatar:true});await persist('settings');$('#avst').textContent='사진을 넣었어요'}
-    catch(err){$('#avst').textContent='사진을 넣지 못했어요'}};
-  const ad=$('#avdel');if(ad)ad.onclick=async()=>{try{await idb('media','readwrite',s=>s.delete('avatar'))}catch(e){}delete URLS.avatar;S.docs.settings=Object.assign(settings(),{avatar:false});await persist('settings');render()};
-  $('#ssave').onclick=async()=>{S.docs.settings={kind:'settings',name:$('#sname').value.trim(),credit:$('#scredit').value.trim(),avatar:settings().avatar,rem:$('#srem').value||'00:00',remOff:$('#soff').checked,key:$('#skey').value.trim(),model:$('#smodel').value.trim()||'gemini-2.5-flash'};const ok=await persist('settings');if(ok)toast('설정을 저장했어요.')};
+    try{await idb('media','readwrite',s=>s.put(f,avKey));if(URLS[avKey]){URL.revokeObjectURL(URLS[avKey]);delete URLS[avKey]}S.docs.settings=Object.assign(settings(),{[avKey]:true});await persist('settings');toast('사진을 넣었어요.');render()}
+    catch(err){toast('사진을 넣지 못했어요.')}};
+  $$('[data-avdel]').forEach(b=>b.onclick=async()=>{const k=b.dataset.avdel;try{await idb('media','readwrite',s=>s.delete(k))}catch(e){}delete URLS[k];S.docs.settings=Object.assign(settings(),{[k]:false});await persist('settings');render()});
+  $('#ssave').onclick=async()=>{S.docs.settings={kind:'settings',name:$('#sname').value.trim(),credit:$('#scredit').value.trim(),avatar:settings().avatar,avatar2:settings().avatar2,rem:$('#srem').value||'00:00',remOff:$('#soff').checked,key:$('#skey').value.trim(),model:$('#smodel').value.trim()||'gemini-2.5-flash'};const ok=await persist('settings');if(ok)toast('설정을 저장했어요.')};
   $('#snoti').onclick=async()=>{if(!('Notification' in window)){toast('이 브라우저는 알림을 지원하지 않아요.');return}const p=await Notification.requestPermission();$('#snst').textContent=p==='granted'?'허용됨':'허용되지 않았어요'};
   $('#bexp').onclick=()=>{const d=clone(S.docs);if(d.settings)delete d.settings.key;saveFile(new Blob([JSON.stringify(d)],{type:'application/json'}),'마음기록_백업_'+today()+'.json');toast('백업 파일을 저장했어요.')};
   $('#bimp').onclick=()=>$('#bfile').click();
