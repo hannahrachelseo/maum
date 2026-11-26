@@ -345,7 +345,7 @@ function vRecord(){
     <label for="h2">그 순간 나는 어떤 기분이었나요?</label><input type="text" id="h2" data-f="h2" value="${esc(W.h2)}">
     <label for="h3">그 순간을 기억하고 싶은 이유는 무엇인가요?</label><input type="text" id="h3" data-f="h3" value="${esc(W.h3)}">
     <div class="media" id="media"></div>
-    <div class="row" id="uprow"><input type="file" id="file" accept="image/*,video/*" hidden><button class="btn ghost sm" id="pick" type="button">사진 · 동영상 첨부 (선택)</button><span id="upst" style="font-size:13px"></span></div>
+    <div class="row" id="uprow"><input type="file" id="file" accept="image/*,video/*" multiple hidden><button class="btn ghost sm" id="pick" type="button">사진 · 동영상 첨부 (여러 장 가능)</button><span id="upst" style="font-size:13px"></span></div>
   </section>
   <div class="savebar"><span class="grow sub" id="st">${S.docs['day_'+S.date]?'저장된 기록이에요':'아직 저장 전이에요'}</span><button class="btn" id="save" type="button">저장하기</button></div>`;
 }
@@ -381,11 +381,14 @@ Q4 지금까지 쓴 답: ${W.q4||'(비어 있음)'}
   };
   $('#pick').onclick=()=>$('#file').click();
   $('#file').onchange=async e=>{
-    const f=e.target.files[0];e.target.value='';if(!f)return;const up=$('#upst');
-    if(f.size>150*1024*1024){up.textContent='150MB보다 큰 파일은 넣을 수 없어요. 더 짧은 영상을 골라 주세요.';return}
-    up.textContent='넣는 중…';
-    try{const id='m'+Date.now();await idb('media','readwrite',s=>s.put(f,id));W.media.push({id,ct:f.type});mediaHtml();await commit();up.textContent='첨부했어요'}
-    catch(err){up.textContent='넣지 못했어요. 휴대폰 저장 공간을 확인해 주세요.'}
+    const fs=[...e.target.files];e.target.value='';if(!fs.length)return;const up=$('#upst');let ok=0,big=0,bad=0;
+    for(let i=0;i<fs.length;i++){const f=fs[i];
+      if(f.size>150*1024*1024){big++;continue}
+      up.textContent=`넣는 중… ${i+1} / ${fs.length}`;
+      try{const id='m'+Date.now()+'_'+i;await idb('media','readwrite',s=>s.put(f,id));W.media.push({id,ct:f.type});ok++}catch(err){bad++}
+    }
+    if(ok){mediaHtml();await commit()}
+    up.textContent=(ok?`${ok}개 첨부했어요.`:'')+(big?` 150MB보다 큰 파일 ${big}개는 넣지 못했어요.`:'')+(bad?` ${bad}개는 넣지 못했어요. 휴대폰 저장 공간을 확인해 주세요.`:'');
   };
 }
 function vEmotions(){
