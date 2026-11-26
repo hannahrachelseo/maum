@@ -57,6 +57,7 @@ textarea{min-height:84px;resize:vertical}
 .sig i.on.y{background:#FFD24D;box-shadow:0 0 0 3px rgba(255,210,77,.35)}
 .sig i.on.g{background:#4CD08A;box-shadow:0 0 0 3px rgba(76,208,138,.35)}
 .sigw{display:flex;flex-direction:column;align-items:center;gap:4px;flex:none;font-size:12px;color:var(--sub)}
+.bubble svg{flex:none}
 .bubble{display:flex;gap:10px;align-items:flex-end}
 .bubble .say{background:#fff;border-radius:18px 18px 18px 4px;padding:10px 14px;box-shadow:0 2px 0 var(--line);font-size:14px}
 .note{background:var(--butter);color:var(--butter-ink);border-radius:16px;padding:10px 14px;font-size:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
@@ -67,6 +68,7 @@ textarea{min-height:84px;resize:vertical}
 .bn.r{background:var(--rose-soft)} .bn.r span{color:#A63E63}
 .bn.l{background:var(--lilac-soft);color:#3A3190} .bn.l span{color:#5348B5}
 .bn.m{background:var(--mint-soft);color:#0B5A43} .bn.m span{color:#17775A}
+.bn.b{background:var(--butter);color:var(--butter-ink)} .bn.b span{color:#8F6414}
 .bn.z{background:#F3EEF0;color:#8B7780}
 .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;background:#fff}
 .pill.ok{background:var(--mint);color:#fff}
@@ -191,11 +193,11 @@ const PERSONA=`너는 30년 넘게 임상에서 일해 온 심리상담 전문�
 
 /* ---------- illustrations (original drawings) ---------- */
 const MONG=(s=64,m='')=>`<svg width="${s}" height="${s}" viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="74" rx="20" ry="3.5" fill="#F7D3DF"/><path d="M24 22c-5-9 2-17 8-10 3 3 3 8 2 12zM56 22c5-9-2-17-8-10-3 3-3 8-2 12z" fill="#fff" stroke="#F3B9CB" stroke-width="2"/><path d="M40 16c17 0 28 12 28 28S57 72 40 72 12 60 12 44s11-28 28-28z" fill="#fff" stroke="#F3B9CB" stroke-width="2"/><circle cx="30" cy="42" r="3" fill="#4A2B38"/><circle cx="50" cy="42" r="3" fill="#4A2B38"/><circle cx="31" cy="41" r="1" fill="#fff"/><circle cx="51" cy="41" r="1" fill="#fff"/><ellipse cx="23" cy="50" rx="5" ry="3.2" fill="#FBB9CC"/><ellipse cx="57" cy="50" rx="5" ry="3.2" fill="#FBB9CC"/>${m==='good'?'<path d="M33 47q7 8 14 0z" fill="#D9557F"/><path d="M8 20l2 5 5 2-5 2-2 5-2-5-5-2 5-2zM72 26l1.5 3.5L77 31l-3.5 1.5L72 36l-1.5-3.5L67 31l3.5-1.5z" fill="#F7B955"/>':m==='low'?'<path d="M36 51q4-3 8 0" fill="none" stroke="#D9557F" stroke-width="2" stroke-linecap="round"/><path d="M25 35l8 2M55 35l-8 2" stroke="#4A2B38" stroke-width="1.6" stroke-linecap="round"/>':'<path d="M36 49q4 4 8 0" fill="none" stroke="#D9557F" stroke-width="2" stroke-linecap="round"/>'}<path d="M40 12c-3-5-9-1-5 4l5 4 5-4c4-5-2-9-5-4z" fill="#D9557F"/></svg>`;
-const ICO={heart:'<path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/>',tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="8" cy="9" r="1.5"/>',stairs:'<path d="M4 20h4v-4h4v-4h4V8h4"/>',lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'};
+const ICO={sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>',heart:'<path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/>',tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="8" cy="9" r="1.5"/>',stairs:'<path d="M4 20h4v-4h4v-4h4V8h4"/>',lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'};
 const ico=(n,c)=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[n]}</svg>`;
 
 /* ---------- state + storage ---------- */
-const S={view:'home',date:today(),docs:{},col:null,assets:null,downloads:null,sample:null,loaded:false,month:today().slice(0,7),cbt:null,emoQ:''};
+const S={joy:null,view:'home',date:today(),docs:{},col:null,assets:null,downloads:null,sample:null,loaded:false,month:today().slice(0,7),cbt:null,emoQ:''};
 let W=null,saveT=null;
 let IDB=null,AIERR=0;const URLS={};
 function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open('maum',1);r.onupgradeneeded=()=>{r.result.createObjectStore('docs');r.result.createObjectStore('media')};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
@@ -251,7 +253,7 @@ function historyText(){
   const L=ds.map(d=>`${d.date} 우울 ${d.dep==null?'-':d.dep} 불안 ${d.anx==null?'-':d.anx}`+(d.q1?` | 상황: ${cut(d.q1,140)}`:'')+(d.q2?` | 반응: ${cut(d.q2,110)}`:'')+((d.q3||[]).length||d.q3etc?` | 필요했던 것: ${(d.q3||[]).concat(d.q3etc?[d.q3etc]:[]).join(', ')}`:'')+(d.q4?` | 작은 행동: ${cut(d.q4,90)}`:'')+((d.emotions||[]).length?` | 감정 이름표: ${d.emotions.join(', ')}`:'')+(d.h1?` | 행복했던 순간: ${cut(d.h1,90)}`:''));
   const cb=cbtList().filter(r=>r.done&&r.summary).slice(0,5).map(r=>`${r.date} ${cut(r.summary,220)}`);
   const pf=(S.docs.aiprofile||{}).text||'';
-  return (pf?`[메모: 이 사용자에 대해 지금까지 정리된 내용. 사용자가 직접 보고 고칠 수 있음]\n${pf}\n\n`:'')+(L.length?`[최근 기록]\n${L.join('\n')}\n\n`:'')+(cb.length?`[최근 생각 따라가기 정리]\n${cb.join('\n')}\n\n`:'');
+  return (pf?`[메모: 이 사용자에 대해 지금까지 정리된 내용. 사용자가 직접 보고 고칠 수 있음]\n${pf}\n\n`:'')+(L.length?`[최근 기록]\n${L.join('\n')}\n\n`:'')+(cb.length?`[최근 생각 따라가기 정리]\n${cb.join('\n')}\n\n`:'')+(joyList().length?`[사용자가 모아 둔 행복했던 순간, 우울함에서 벗어난 순간]\n${joyList().slice(0,8).map(j=>`${j.date} ${JT[j.type]}: ${cut(j.text,120)}`+(j.helped?` | 도움이 된 것: ${cut(j.helped,60)}`:'')).join('\n')}\n\n`:'');
 }
 async function askAI(task){const v=await gem(PERSONA+'\n\n'+historyText()+task);if(v)logAI(task,v);return v}
 function logAI(task,v){
@@ -308,6 +310,7 @@ function vHome(){
   <button class="bn r" data-open="record" type="button"><span class="ic">${ico('heart','#D9557F')}</span><span class="grow"><b>오늘의 마음 기록</b><span>${n?`연속 ${n}일째 · `:''}매일 작성</span></span><span class="pill ${done?'ok':''}">${done?'작성 완료':'미작성'}</span></button>
   <button class="bn l" data-open="emotions" type="button"><span class="ic">${ico('tag','#7468D6')}</span><span class="grow"><b>감정에 이름표 붙이기</b><span>감정 100가지${emoN?` · 오늘 ${emoN}개 붙였어요`:''}</span></span></button>
   <button class="bn m" data-open="cbt" type="button"><span class="ic">${ico('stairs','#1F8F6C')}</span><span class="grow"><b>생각 따라가기</b><span>행동에서 대책까지, 한 단계씩</span></span></button>
+  <button class="bn b" data-open="joy" type="button"><span class="ic">${ico('sun','#D99A1C')}</span><span class="grow"><b>행복 모음</b><span>행복했던 순간, 우울함에서 벗어난 순간${joyList().length?` · ${joyList().length}개`:''}</span></span></button>
   <div class="bn z"><span class="ic">${ico('lock','#B5A6AC')}</span><span class="grow"><b>네 번째 배너</b><span>준비 중이에요</span></span></div>
   <div class="tiles"><button class="tile" data-go="graph" type="button">월별 그래프</button><button class="tile" data-go="pdf" type="button">PDF 만들기</button><button class="tile" data-go="settings" type="button">설정</button></div>
   ${st.credit?`<p class="foot">${esc(st.credit)}</p>`:''}`;
@@ -478,6 +481,59 @@ function bCbt(){
     aiBox($('#cai'),{ai:!!r,msg:r?r.message:aiWhy(),question:r?r.question:'',cues:r&&Array.isArray(r.cues)&&r.cues.length?r.cues.slice(0,6):s.cues,onPick:t=>{if(t!=='잘 모르겠어요')addTo(ta,t);else toast('괜찮아요. 떠오르는 만큼만 한 단어로 적어도 돼요.')}});
   };
 }
+/* joy */
+const JT={happy:'행복을 느낀 순간',lift:'우울함에서 벗어난 순간'};
+const joyList=()=>Object.keys(S.docs).filter(k=>k.startsWith('joy_')).map(k=>S.docs[k]).sort((a,b)=>b.createdAt-a.createdAt);
+function joyAll(){
+  const fromDay=Object.keys(S.docs).filter(k=>k.startsWith('day_')&&S.docs[k].h1).map(k=>{const d=S.docs[k];return {date:d.date,createdAt:toDate(d.date).getTime(),type:'happy',text:d.h1,feel:d.h2,helped:'',media:d.media||[],fromDay:true}});
+  return joyList().concat(fromDay).sort((a,b)=>b.createdAt-a.createdAt);
+}
+const joyCard=(r,del)=>`<div class="rec"><div class="row"><b class="d grow" style="font-weight:400">${fmtK(r.date)}</b><span class="pill" style="background:${r.type==='lift'?'var(--mint-soft)':'var(--butter)'}">${JT[r.type]||JT.happy}</span></div><p>${esc(r.text).replace(/\n/g,'<br>')}</p>${r.feel?`<p class="sub">그때 기분: ${esc(r.feel)}</p>`:''}${r.helped?`<p class="sub">도움이 된 것: ${esc(r.helped)}</p>`:''}${(r.media||[]).length?`<div class="media">${r.media.map(m=>`<figure>${String(m.ct||'').startsWith('video')?`<video data-mid="${esc(m.id)}" controls playsinline preload="metadata"></video>`:`<img data-mid="${esc(m.id)}" alt="순간 사진">`}</figure>`).join('')}</div>`:''}${r.fromDay?'<p class="sub">오늘의 마음 기록에서 적은 순간</p>':del?`<div><button class="btn ghost sm" data-jdel="${r.id}" type="button">지우기</button></div>`:''}</div>`;
+function vJoy(){
+  const j=S.joy;
+  if(!j){
+    const all=joyAll();
+    return `${topBar('행복 모음')}
+    <div class="bubble">${MONG(52,'good')}<div class="say">행복을 느꼈거나 우울함에서 잠깐이라도 벗어난 순간을 모아 둬요. 아주 작은 것도 좋아요. 힘든 날 꺼내 볼 수 있어요.</div></div>
+    <div class="row"><button class="btn grow" id="jnew" type="button">새 순간 적기</button>${all.length?'<button class="btn ghost" id="jrand" type="button">하나 꺼내 보기</button>':''}</div>
+    <div id="jpick" hidden></div>
+    ${all.length?`<h3>모아 둔 순간 ${all.length}개</h3>${all.map(r=>joyCard(r,true)).join('')}`:'<section class="card"><p class="sub">아직 모아 둔 순간이 없어요. 오늘 있었던 작은 일 하나부터 적어 볼까요? 예: 따뜻한 커피 첫 모금, 산책하다 본 하늘, 누군가의 한마디.</p></section>'}`;
+  }
+  return `${topBar('행복 모음')}
+  <section class="card happy"><p class="q">어떤 순간이었나요?</p>
+  <div class="chips" id="jtype">${Object.keys(JT).map(k=>`<button type="button" class="chip ${j.type===k?'on':''}" data-t="${k}">${JT[k]}</button>`).join('')}</div>
+  <label class="q" for="jdate">언제였나요?</label><input type="date" id="jdate" value="${j.date}" max="${today()}">
+  <label class="q" for="jtext">무슨 일이 있었나요?</label><textarea id="jtext" placeholder="산책하다 본 노을이 예뻐서 한참 서 있었다">${esc(j.text)}</textarea><p class="err" id="jerr" hidden>한 줄이라도 적어 주세요.</p>
+  <label class="q" for="jfeel">그때 기분은 어땠나요? (선택)</label><input type="text" id="jfeel" value="${esc(j.feel)}">
+  <label class="q" for="jhelp">무엇이 도움이 됐나요? 사람, 장소, 행동 (선택)</label><input type="text" id="jhelp" value="${esc(j.helped)}">
+  <div class="media" id="jmedia"></div>
+  <div class="row"><input type="file" id="jfile" accept="image/*,video/*" multiple hidden><button class="btn ghost sm" id="jpickf" type="button">사진 · 동영상 첨부 (여러 장 가능)</button><span id="jupst" style="font-size:13px"></span></div>
+  <div class="row"><button class="btn ghost" id="jcancel" type="button">취소</button><button class="btn grow" id="jsave" type="button">모음에 담기</button></div></section>`;
+}
+function bJoy(){
+  const j=S.joy;
+  if(!j){
+    fillMedia($('#app'));
+    $('#jnew').onclick=()=>{const now=Date.now();S.joy={kind:'joy',id:String(now),date:today(),createdAt:now,type:'happy',text:'',feel:'',helped:'',media:[]};render()};
+    const rb=$('#jrand');if(rb)rb.onclick=()=>{const all=joyAll(),r=all[Math.floor(Math.random()*all.length)],box=$('#jpick');box.hidden=false;box.innerHTML='<p class="sub">이런 순간이 있었어요.</p>'+joyCard(r,false);fillMedia(box)};
+    $$('[data-jdel]').forEach(b=>b.onclick=async()=>{if(!b.dataset.sure){b.dataset.sure=1;b.textContent='정말 지울까요? 한 번 더 누르기';return}const r=S.docs['joy_'+b.dataset.jdel];for(const m of (r&&r.media)||[]){try{await idb('media','readwrite',s=>s.delete(m.id))}catch(e){}}await removeDoc('joy_'+b.dataset.jdel);render()});
+    return;
+  }
+  const paint=()=>{$('#jmedia').innerHTML=j.media.map((m,i)=>`<figure>${String(m.ct||'').startsWith('video')?`<video data-mid="${esc(m.id)}" controls playsinline preload="metadata"></video>`:`<img data-mid="${esc(m.id)}" alt="순간 사진 ${i+1}">`}<button type="button" data-rm="${i}" aria-label="첨부 지우기">×</button></figure>`).join('');fillMedia($('#jmedia'));
+    $$('#jmedia [data-rm]').forEach(b=>b.onclick=async()=>{const m=j.media.splice(+b.dataset.rm,1)[0];paint();try{await idb('media','readwrite',s=>s.delete(m.id))}catch(e){}})};
+  paint();
+  $$('#jtype .chip').forEach(b=>b.onclick=()=>{j.type=b.dataset.t;$$('#jtype .chip').forEach(x=>x.classList.toggle('on',x===b))});
+  $('#jdate').onchange=e=>{j.date=e.target.value||today()};
+  $('#jtext').oninput=e=>{j.text=e.target.value;$('#jerr').hidden=true};
+  $('#jfeel').oninput=e=>{j.feel=e.target.value};$('#jhelp').oninput=e=>{j.helped=e.target.value};
+  $('#jpickf').onclick=()=>$('#jfile').click();
+  $('#jfile').onchange=async e=>{const fs=[...e.target.files];e.target.value='';if(!fs.length)return;const up=$('#jupst');let ok=0,no=0;
+    for(let i=0;i<fs.length;i++){const f=fs[i];if(f.size>150*1024*1024){no++;continue}up.textContent=`넣는 중… ${i+1} / ${fs.length}`;
+      try{const id='j'+Date.now()+'_'+i;await idb('media','readwrite',s=>s.put(f,id));j.media.push({id,ct:f.type});ok++}catch(err){no++}}
+    paint();up.textContent=(ok?`${ok}개 첨부했어요.`:'')+(no?` ${no}개는 넣지 못했어요 (150MB 초과 또는 저장 공간 부족).`:'')};
+  $('#jcancel').onclick=async()=>{for(const m of j.media){try{await idb('media','readwrite',s=>s.delete(m.id))}catch(e){}}S.joy=null;render()};
+  $('#jsave').onclick=async()=>{j.text=j.text.trim();if(!j.text){$('#jerr').hidden=false;$('#jtext').focus();return}S.docs['joy_'+j.id]=clone(j);if(await persist('joy_'+j.id)){S.joy=null;render();toast('행복 모음에 담았어요.')}};
+}
 /* graph */
 function drawChart(cv,dates,w,h){
   const dpr=Math.min(window.devicePixelRatio||1,2);cv.width=w*dpr;cv.height=h*dpr;cv.style.width=w+'px';cv.style.height=h+'px';
@@ -547,6 +603,7 @@ async function buildPdf(f,t,photos,st){
    ${kv('감정 이름표',(d.emotions||[]).join(', '))}${kv('감정 메모',d.emoNote)}
    ${kv('행복했던 순간',d.h1)}${kv('그때의 기분',d.h2)}${kv('기억하고 싶은 이유',d.h3)}
    ${(d.media||[]).length?`<div>${d.media.map(m=>String(m.ct||'').startsWith('video')?'<span class="pk">동영상 첨부 있음 </span>':photos?`<img data-mid="${esc(m.id)}">`:'<span class="pk">사진 첨부 있음 </span>').join('')}</div>`:''}</div></div>`).join('')}
+  ${joyList().filter(j=>j.date>=f&&j.date<=t).reverse().map(j=>`<div class="pb"><div class="pd"><h2>행복 모음 · ${fmtK(j.date)}</h2>${kv(JT[j.type]||JT.happy,j.text)}${kv('그때 기분',j.feel)}${kv('도움이 된 것',j.helped)}${(j.media||[]).length?`<div>${j.media.map(m=>String(m.ct||'').startsWith('video')?'<span class="pk">동영상 첨부 있음 </span>':photos?`<img data-mid="${esc(m.id)}">`:'<span class="pk">사진 첨부 있음 </span>').join('')}</div>`:''}</div></div>`).join('')}
   ${cb.map(r=>`<div class="pb"><div class="pd"><h2>생각 따라가기 · ${fmtK(r.date)}</h2>${STEPS.map(s=>kv(s.t,r.steps[s.k])).join('')}${kv('나의 마음 정리',r.summary)}</div></div>`).join('')}
   ${settings().credit?`<div class="pb"><p style="text-align:center;color:#946577">${esc(settings().credit)}</p></div>`:''}`;
   drawChart($('#pcv'),ds,740,240);
@@ -609,15 +666,15 @@ function bSettings(){
   $('#bexp').onclick=()=>{const d=clone(S.docs);if(d.settings)delete d.settings.key;saveFile(new Blob([JSON.stringify(d)],{type:'application/json'}),'마음기록_백업_'+today()+'.json');toast('백업 파일을 저장했어요.')};
   $('#bimp').onclick=()=>$('#bfile').click();
   $('#bfile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
-    try{const d=JSON.parse(await f.text());let n=0;for(const k of Object.keys(d)){if(!/^(day_|cbt_|settings$|aiprofile$|ailog$)/.test(k))continue;if(k==='settings')d[k].key=settings().key;if(k.startsWith('day_'))d[k].media=(S.docs[k]&&S.docs[k].media)||[];S.docs[k]=d[k];await persist(k);n++}toast('기록 '+n+'개를 불러왔어요.')}
+    try{const d=JSON.parse(await f.text());let n=0;for(const k of Object.keys(d)){if(!/^(day_|cbt_|joy_|settings$|aiprofile$|ailog$)/.test(k))continue;if(k==='settings')d[k].key=settings().key;if(k.startsWith('day_')||k.startsWith('joy_'))d[k].media=(S.docs[k]&&S.docs[k].media)||[];S.docs[k]=d[k];await persist(k);n++}toast('기록 '+n+'개를 불러왔어요.')}
     catch(err){toast('백업 파일을 읽지 못했어요. 이 앱에서 저장한 파일인지 확인해 주세요.')}};
 }
-const VIEWS={home:vHome,record:vRecord,emotions:vEmotions,cbt:vCbt,graph:vGraph,pdf:vPdf,settings:vSettings};
-const BIND={record:bRecord,emotions:bEmotions,cbt:bCbt,graph:bGraph,pdf:bPdf,settings:bSettings};
+const VIEWS={home:vHome,joy:vJoy,record:vRecord,emotions:vEmotions,cbt:vCbt,graph:vGraph,pdf:vPdf,settings:vSettings};
+const BIND={record:bRecord,joy:bJoy,emotions:bEmotions,cbt:bCbt,graph:bGraph,pdf:bPdf,settings:bSettings};
 function render(){$('#app').innerHTML=VIEWS[S.view]();if(BIND[S.view])BIND[S.view]();if(S.view==='home'&&IDB)fillMedia($('.hero'));window.scrollTo(0,0)}
 function go(v,date){
   if(!S.loaded){toast('기록을 불러오는 중이에요. 잠시만요.');return}
-  flushSave();if(v==='home')S.cbt=null;if(date)S.date=date;S.view=v;render();
+  flushSave();if(v==='home'){S.cbt=null;S.joy=null}if(date)S.date=date;S.view=v;render();
 }
 $('#app').addEventListener('click',e=>{
   const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return}
