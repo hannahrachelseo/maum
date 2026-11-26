@@ -69,6 +69,8 @@ textarea{min-height:84px;resize:vertical}
 .bn.l{background:var(--lilac-soft);color:#3A3190} .bn.l span{color:#5348B5}
 .bn.m{background:var(--mint-soft);color:#0B5A43} .bn.m span{color:#17775A}
 .bn.b{background:var(--butter);color:var(--butter-ink)} .bn.b span{color:#8F6414}
+.bn.s{background:#E3F1FB;color:#1F4F78} .bn.s span{color:#2F6A9C}
+.way{display:flex;gap:8px;align-items:center;background:#fff;border-radius:14px;padding:8px 10px;font-size:14px}
 .bn.z{background:#F3EEF0;color:#8B7780}
 .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;background:#fff}
 .pill.ok{background:var(--mint);color:#fff}
@@ -193,7 +195,7 @@ const PERSONA=`너는 30년 넘게 임상에서 일해 온 심리상담 전문�
 
 /* ---------- illustrations (original drawings) ---------- */
 const MONG=(s=64,m='')=>`<svg width="${s}" height="${s}" viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="74" rx="20" ry="3.5" fill="#F7D3DF"/><path d="M24 22c-5-9 2-17 8-10 3 3 3 8 2 12zM56 22c5-9-2-17-8-10-3 3-3 8-2 12z" fill="#fff" stroke="#F3B9CB" stroke-width="2"/><path d="M40 16c17 0 28 12 28 28S57 72 40 72 12 60 12 44s11-28 28-28z" fill="#fff" stroke="#F3B9CB" stroke-width="2"/><circle cx="30" cy="42" r="3" fill="#4A2B38"/><circle cx="50" cy="42" r="3" fill="#4A2B38"/><circle cx="31" cy="41" r="1" fill="#fff"/><circle cx="51" cy="41" r="1" fill="#fff"/><ellipse cx="23" cy="50" rx="5" ry="3.2" fill="#FBB9CC"/><ellipse cx="57" cy="50" rx="5" ry="3.2" fill="#FBB9CC"/>${m==='good'?'<path d="M33 47q7 8 14 0z" fill="#D9557F"/><path d="M8 20l2 5 5 2-5 2-2 5-2-5-5-2 5-2zM72 26l1.5 3.5L77 31l-3.5 1.5L72 36l-1.5-3.5L67 31l3.5-1.5z" fill="#F7B955"/>':m==='low'?'<path d="M36 51q4-3 8 0" fill="none" stroke="#D9557F" stroke-width="2" stroke-linecap="round"/><path d="M25 35l8 2M55 35l-8 2" stroke="#4A2B38" stroke-width="1.6" stroke-linecap="round"/>':'<path d="M36 49q4 4 8 0" fill="none" stroke="#D9557F" stroke-width="2" stroke-linecap="round"/>'}<path d="M40 12c-3-5-9-1-5 4l5 4 5-4c4-5-2-9-5-4z" fill="#D9557F"/></svg>`;
-const ICO={sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>',heart:'<path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/>',tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="8" cy="9" r="1.5"/>',stairs:'<path d="M4 20h4v-4h4v-4h4V8h4"/>',lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'};
+const ICO={bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>',heart:'<path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/>',tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="8" cy="9" r="1.5"/>',stairs:'<path d="M4 20h4v-4h4v-4h4V8h4"/>',lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'};
 const ico=(n,c)=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[n]}</svg>`;
 
 /* ---------- state + storage ---------- */
@@ -253,7 +255,7 @@ function historyText(){
   const L=ds.map(d=>`${d.date} 우울 ${d.dep==null?'-':d.dep} 불안 ${d.anx==null?'-':d.anx}`+(d.q1?` | 상황: ${cut(d.q1,140)}`:'')+(d.q2?` | 반응: ${cut(d.q2,110)}`:'')+((d.q3||[]).length||d.q3etc?` | 필요했던 것: ${(d.q3||[]).concat(d.q3etc?[d.q3etc]:[]).join(', ')}`:'')+(d.q4?` | 작은 행동: ${cut(d.q4,90)}`:'')+((d.emotions||[]).length?` | 감정 이름표: ${d.emotions.join(', ')}`:'')+(d.h1?` | 행복했던 순간: ${cut(d.h1,90)}`:''));
   const cb=cbtList().filter(r=>r.done&&r.summary).slice(0,5).map(r=>`${r.date} ${cut(r.summary,220)}`);
   const pf=(S.docs.aiprofile||{}).text||'';
-  return (pf?`[메모: 이 사용자에 대해 지금까지 정리된 내용. 사용자가 직접 보고 고칠 수 있음]\n${pf}\n\n`:'')+(L.length?`[최근 기록]\n${L.join('\n')}\n\n`:'')+(cb.length?`[최근 생각 따라가기 정리]\n${cb.join('\n')}\n\n`:'')+(joyList().length?`[사용자가 모아 둔 행복했던 순간, 우울함에서 벗어난 순간]\n${joyList().slice(0,8).map(j=>`${j.date} ${JT[j.type]}: ${cut(j.text,120)}`+(j.helped?` | 도움이 된 것: ${cut(j.helped,60)}`:'')).join('\n')}\n\n`:'');
+  return (pf?`[메모: 이 사용자에 대해 지금까지 정리된 내용. 사용자가 직접 보고 고칠 수 있음]\n${pf}\n\n`:'')+(L.length?`[최근 기록]\n${L.join('\n')}\n\n`:'')+(cb.length?`[최근 생각 따라가기 정리]\n${cb.join('\n')}\n\n`:'')+(ways().happy.length||ways().lift.length?`[사용자가 직접 적은 나만의 방법 (괄호는 해 본 횟수)]\n행복을 느끼는 방법: ${ways().happy.map(x=>`${cut(x.text,50)}(${x.n||0})`).join(', ')||'없음'}\n우울함에서 벗어나는 방법: ${ways().lift.map(x=>`${cut(x.text,50)}(${x.n||0})`).join(', ')||'없음'}\n\n`:'')+(joyList().length?`[사용자가 모아 둔 행복했던 순간, 우울함에서 벗어난 순간]\n${joyList().slice(0,8).map(j=>`${j.date} ${JT[j.type]}: ${cut(j.text,120)}`+(j.helped?` | 도움이 된 것: ${cut(j.helped,60)}`:'')).join('\n')}\n\n`:'');
 }
 async function askAI(task){const v=await gem(PERSONA+'\n\n'+historyText()+task);if(v)logAI(task,v);return v}
 function logAI(task,v){
@@ -306,11 +308,13 @@ function vHome(){
   const say=!S.loaded?'기록을 불러오고 있어요. 잠시만요.':md==='low'?'오늘 많이 힘들었죠. 여기까지 적은 것만으로도 충분해요. 내가 옆에 있을게요.':md==='good'?'오늘 마음이 한결 가벼워 보여요. 이 느낌을 기억해 둬요.':hr<11?'좋은 아침이에요. 오늘 마음은 천천히 살펴봐도 돼요.':hr<18?'오늘 하루는 어떻게 흘러가고 있나요?':'오늘 하루도 애썼어요. 자기 전에 마음을 한 번 적어 볼까요?';
   return `<div class="hero"><div class="grow"><p class="sub">${fmtK(t)}</p><h1>${st.name?esc(st.name)+'야,<br>':''}오늘 마음은 어때?</h1></div>${sigHtml()}${avKey()?`<div class="avw"><img class="av l${level()}" data-mid="${avKey()}" alt="내 사진">${level()?`<span class="pill">오늘 평균 ${avgToday()}점</span>`:''}</div>`:''}</div>
   <div class="bubble">${MONG(60,md)}<div class="say">${say}</div></div>
+  ${md==='low'&&ways().lift.length?`<div class="note"><span>내가 적어 둔 방법: ${esc(ways().lift[new Date().getDate()%ways().lift.length].text)}</span><button class="btn sm" data-open="ways" type="button">방법 보기</button></div>`:''}
   ${rt?`<div class="note"><span>${rt===t?'오늘':'어제'} 마음 기록이 아직 없어요.</span><button class="btn sm" id="remgo" type="button">지금 쓰기</button></div>`:''}
   <button class="bn r" data-open="record" type="button"><span class="ic">${ico('heart','#D9557F')}</span><span class="grow"><b>오늘의 마음 기록</b><span>${n?`연속 ${n}일째 · `:''}매일 작성</span></span><span class="pill ${done?'ok':''}">${done?'작성 완료':'미작성'}</span></button>
   <button class="bn l" data-open="emotions" type="button"><span class="ic">${ico('tag','#7468D6')}</span><span class="grow"><b>감정에 이름표 붙이기</b><span>감정 100가지${emoN?` · 오늘 ${emoN}개 붙였어요`:''}</span></span></button>
   <button class="bn m" data-open="cbt" type="button"><span class="ic">${ico('stairs','#1F8F6C')}</span><span class="grow"><b>생각 따라가기</b><span>행동에서 대책까지, 한 단계씩</span></span></button>
   <button class="bn b" data-open="joy" type="button"><span class="ic">${ico('sun','#D99A1C')}</span><span class="grow"><b>행복 모음</b><span>행복했던 순간, 우울함에서 벗어난 순간${joyList().length?` · ${joyList().length}개`:''}</span></span></button>
+  <button class="bn s" data-open="ways" type="button"><span class="ic">${ico('bulb','#3B82C4')}</span><span class="grow"><b>나만의 방법</b><span>행복해지는 방법 ${ways().happy.length}개 · 우울함에서 벗어나는 방법 ${ways().lift.length}개</span></span></button>
   <div class="bn z"><span class="ic">${ico('lock','#B5A6AC')}</span><span class="grow"><b>네 번째 배너</b><span>준비 중이에요</span></span></div>
   <div class="tiles"><button class="tile" data-go="graph" type="button">월별 그래프</button><button class="tile" data-go="pdf" type="button">PDF 만들기</button><button class="tile" data-go="settings" type="button">설정</button></div>
   ${st.credit?`<p class="foot">${esc(st.credit)}</p>`:''}`;
@@ -534,6 +538,26 @@ function bJoy(){
   $('#jcancel').onclick=async()=>{for(const m of j.media){try{await idb('media','readwrite',s=>s.delete(m.id))}catch(e){}}S.joy=null;render()};
   $('#jsave').onclick=async()=>{j.text=j.text.trim();if(!j.text){$('#jerr').hidden=false;$('#jtext').focus();return}S.docs['joy_'+j.id]=clone(j);if(await persist('joy_'+j.id)){S.joy=null;render();toast('행복 모음에 담았어요.')}};
 }
+/* ways */
+const WT={happy:['행복을 느끼는 방법','좋아하는 카페에서 혼자 책 읽기'],lift:['우울함에서 벗어나는 방법','샤워하고 10분 걷기']};
+const ways=()=>Object.assign({kind:'ways',happy:[],lift:[]},S.docs.ways||{});
+function vWays(){
+  const w=ways();
+  return `${topBar('나만의 방법')}
+  <div class="bubble">${MONG(52)}<div class="say">나에게 맞는 방법을 찾는 중이죠. 떠오르는 대로 적어 두고, 해 본 날은 눌러서 세어 봐요. 자주 누른 방법이 나에게 잘 맞는 방법이에요.</div></div>
+  ${Object.keys(WT).map(k=>`<section class="card" style="background:${k==='happy'?'var(--butter)':'var(--mint-soft)'}"><h3>${WT[k][0]} <span class="sub">${w[k].length}개</span></h3>
+   ${w[k].length?w[k].map(x=>`<div class="way"><span class="grow">${esc(x.text)}</span><button class="btn ghost sm" data-wdo="${k}:${x.id}" type="button">해 봤어요${x.n?` ${x.n}번`:''}</button><button type="button" data-wdel="${k}:${x.id}" aria-label="지우기" style="color:var(--sub);font-size:18px;padding:0 4px">×</button></div>`).join(''):'<p class="sub">아직 적은 방법이 없어요.</p>'}
+   <div class="row"><input type="text" id="win_${k}" class="grow" style="width:auto" placeholder="${WT[k][1]}" aria-label="${WT[k][0]} 적기"><button class="btn sm" data-wadd="${k}" type="button">추가</button></div></section>`).join('')}
+  <p class="sub">힘든 날(평균 6점 이상)에는 홈 화면에 내가 적은 "우울함에서 벗어나는 방법" 하나가 보여요.</p>`;
+}
+function bWays(){
+  const save=async w=>{S.docs.ways=w;await persist('ways');render()};
+  const add=k=>{const el=$('#win_'+k),v=el.value.trim();if(!v){el.focus();return}const w=clone(ways());w[k].push({id:String(Date.now()),text:v,n:0});save(w)};
+  $$('[data-wadd]').forEach(b=>b.onclick=()=>add(b.dataset.wadd));
+  Object.keys(WT).forEach(k=>{$('#win_'+k).onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing)add(k)}});
+  $$('[data-wdo]').forEach(b=>b.onclick=()=>{const [k,id]=b.dataset.wdo.split(':'),w=clone(ways()),x=w[k].find(i=>i.id===id);if(x){x.n=(x.n||0)+1;x.last=today();save(w).then(()=>toast('해 본 나를 칭찬해요.'))}});
+  $$('[data-wdel]').forEach(b=>b.onclick=()=>{if(!b.dataset.sure){b.dataset.sure=1;b.textContent='지우기?';b.style.fontSize='13px';return}const [k,id]=b.dataset.wdel.split(':'),w=clone(ways());w[k]=w[k].filter(i=>i.id!==id);save(w)});
+}
 /* graph */
 function drawChart(cv,dates,w,h){
   const dpr=Math.min(window.devicePixelRatio||1,2);cv.width=w*dpr;cv.height=h*dpr;cv.style.width=w+'px';cv.style.height=h+'px';
@@ -666,11 +690,11 @@ function bSettings(){
   $('#bexp').onclick=()=>{const d=clone(S.docs);if(d.settings)delete d.settings.key;saveFile(new Blob([JSON.stringify(d)],{type:'application/json'}),'마음기록_백업_'+today()+'.json');toast('백업 파일을 저장했어요.')};
   $('#bimp').onclick=()=>$('#bfile').click();
   $('#bfile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
-    try{const d=JSON.parse(await f.text());let n=0;for(const k of Object.keys(d)){if(!/^(day_|cbt_|joy_|settings$|aiprofile$|ailog$)/.test(k))continue;if(k==='settings')d[k].key=settings().key;if(k.startsWith('day_')||k.startsWith('joy_'))d[k].media=(S.docs[k]&&S.docs[k].media)||[];S.docs[k]=d[k];await persist(k);n++}toast('기록 '+n+'개를 불러왔어요.')}
+    try{const d=JSON.parse(await f.text());let n=0;for(const k of Object.keys(d)){if(!/^(day_|cbt_|joy_|ways$|settings$|aiprofile$|ailog$)/.test(k))continue;if(k==='settings')d[k].key=settings().key;if(k.startsWith('day_')||k.startsWith('joy_'))d[k].media=(S.docs[k]&&S.docs[k].media)||[];S.docs[k]=d[k];await persist(k);n++}toast('기록 '+n+'개를 불러왔어요.')}
     catch(err){toast('백업 파일을 읽지 못했어요. 이 앱에서 저장한 파일인지 확인해 주세요.')}};
 }
-const VIEWS={home:vHome,joy:vJoy,record:vRecord,emotions:vEmotions,cbt:vCbt,graph:vGraph,pdf:vPdf,settings:vSettings};
-const BIND={record:bRecord,joy:bJoy,emotions:bEmotions,cbt:bCbt,graph:bGraph,pdf:bPdf,settings:bSettings};
+const VIEWS={home:vHome,ways:vWays,joy:vJoy,record:vRecord,emotions:vEmotions,cbt:vCbt,graph:vGraph,pdf:vPdf,settings:vSettings};
+const BIND={record:bRecord,ways:bWays,joy:bJoy,emotions:bEmotions,cbt:bCbt,graph:bGraph,pdf:bPdf,settings:bSettings};
 function render(){$('#app').innerHTML=VIEWS[S.view]();if(BIND[S.view])BIND[S.view]();if(S.view==='home'&&IDB)fillMedia($('.hero'));window.scrollTo(0,0)}
 function go(v,date){
   if(!S.loaded){toast('기록을 불러오는 중이에요. 잠시만요.');return}
